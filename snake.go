@@ -61,6 +61,27 @@ func NewSnake() *Snake {
 	}
 }
 
+func (s *Snake) Update(frame int) {
+	frame = frame % period
+	if frame == period-1 {
+		s.Shift()
+	}
+}
+
+func (s *Snake) Shift() {
+	head := firefly.Point{
+		X: s.Head.Head.X + segmentLen,
+		Y: s.Head.Head.Y,
+	}
+	segment := s.Head
+	for segment != nil {
+		oldHead := segment.Head
+		segment.Head = head
+		head = oldHead
+		segment = segment.Tail
+	}
+}
+
 func (s *Snake) Render(frame int) {
 	frame = frame % period
 	segment := s.Head

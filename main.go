@@ -19,6 +19,7 @@ func boot() {
 
 func update() {
 	frame += 1
+	snake.Update(frame)
 }
 
 func render() {
