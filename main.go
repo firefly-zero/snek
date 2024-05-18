@@ -20,6 +20,7 @@ func boot() {
 func update() {
 	frame += 1
 	snake.Update(frame)
+	snake.TryEat(&apple)
 }
 
 func render() {

@@ -55,6 +55,8 @@ type Snake struct {
 	Mouth firefly.Point
 	// The snake's movement direction in radians. Updated based on touch pad.
 	Dir float32
+	// Indicates that the snake eat an apple and is currently growing.
+	growing bool
 }
 
 func NewSnake() *Snake {
@@ -112,9 +114,16 @@ func (s *Snake) updateMouth(frame int) {
 
 // Check if the snake can eat the apple.
 //
-// If it can, start growing the snake.
-func (s *Snake) TryEat(a Apple) bool {
-	return false
+// If it can, start growing the snake and move the apple.
+func (s *Snake) TryEat(a *Apple) {
+	x := a.Pos.X - s.Mouth.X
+	y := a.Pos.Y - s.Mouth.Y
+	distance := math.Sqrt(float64(x*x + y*y))
+	if distance > appleRadius {
+		return
+	}
+	s.growing = true
+	a.Move()
 }
 
 func (s *Snake) Render(frame int) {
