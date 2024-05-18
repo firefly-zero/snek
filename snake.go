@@ -1,6 +1,10 @@
 package main
 
-import "github.com/firefly-zero/firefly-go/firefly"
+import (
+	"math"
+
+	"github.com/firefly-zero/firefly-go/firefly"
+)
 
 const (
 	period     = 10
@@ -33,8 +37,8 @@ func (s *Segment) Render(frame int) {
 	firefly.DrawLine(start, end, style)
 	firefly.DrawCircle(
 		firefly.Point{
-			X: end.X - snakeWidth/2 + 1,
-			Y: end.Y - snakeWidth/2 + 1,
+			X: end.X - snakeWidth/2,
+			Y: end.Y - snakeWidth/2,
 		},
 		snakeWidth,
 		firefly.Style{
@@ -63,15 +67,21 @@ func NewSnake() *Snake {
 
 func (s *Snake) Update(frame int) {
 	frame = frame % period
+	pad, pressed := firefly.ReadPad(firefly.Player0)
+	if pressed {
+		s.Dir = pad.Azimuth().Radians()
+	}
 	if frame == period-1 {
 		s.Shift()
 	}
 }
 
 func (s *Snake) Shift() {
+	shiftX := math.Cos(float64(s.Dir)) * float64(segmentLen)
+	shiftY := math.Sin(float64(s.Dir)) * float64(segmentLen)
 	head := firefly.Point{
-		X: s.Head.Head.X + segmentLen,
-		Y: s.Head.Head.Y,
+		X: s.Head.Head.X + int(shiftX),
+		Y: s.Head.Head.Y - int(shiftY),
 	}
 	segment := s.Head
 	for segment != nil {
