@@ -12,6 +12,20 @@ const (
 	segmentLen = 16
 )
 
+type State uint8
+
+const (
+	// The snake's size is stable.
+	Moving State = 0
+
+	// The snake just eat an apple and waiting to grow.
+	Eating State = 1
+
+	// The snake is growing.
+	// The tail is not moving and the next shift will add a segment.
+	Growing State = 2
+)
+
 var snake *Snake
 
 type Segment struct {
@@ -20,7 +34,7 @@ type Segment struct {
 }
 
 // Render the snake's segment
-func (s *Segment) Render(frame int) {
+func (s *Segment) Render(frame int, state State) {
 	style := firefly.LineStyle{
 		Color: firefly.ColorBlue,
 		Width: snakeWidth,
@@ -31,7 +45,7 @@ func (s *Segment) Render(frame int) {
 	start := s.Head
 	end := s.Tail.Head
 	// if this is the last segment (the snake's tail), draw it shorter.
-	if s.Tail.Tail == nil {
+	if s.Tail.Tail == nil && state != Growing {
 		end.X = start.X + ((end.X - start.X) * (period - frame) / period)
 		end.Y = start.Y + ((end.Y - start.Y) * (period - frame) / period)
 	}
@@ -51,12 +65,15 @@ func (s *Segment) Render(frame int) {
 type Snake struct {
 	// The start point of the first full-length segment (the neck).
 	Head *Segment
+
 	// The very first point of the snake. Updated based on Dir.
 	Mouth firefly.Point
+
 	// The snake's movement direction in radians. Updated based on touch pad.
 	Dir float32
-	// Indicates that the snake eat an apple and is currently growing.
-	growing bool
+
+	// Indicates if the snake is growing.
+	state State
 }
 
 func NewSnake() *Snake {
@@ -68,7 +85,6 @@ func NewSnake() *Snake {
 				Tail: nil,
 			},
 		},
-		Dir: 0,
 	}
 }
 
@@ -92,6 +108,18 @@ func (s *Snake) shift() {
 		X: s.Head.Head.X + int(shiftX),
 		Y: s.Head.Head.Y - int(shiftY),
 	}
+
+	if s.state == Growing {
+		s.Head = &Segment{
+			Head: head,
+			Tail: s.Head,
+		}
+		s.state = Moving
+	}
+	if s.state == Eating {
+		s.state = Growing
+	}
+
 	segment := s.Head
 	for segment != nil {
 		oldHead := segment.Head
@@ -122,7 +150,7 @@ func (s *Snake) TryEat(a *Apple) {
 	if distance > appleRadius {
 		return
 	}
-	s.growing = true
+	s.state = Eating
 	a.Move()
 }
 
@@ -130,7 +158,7 @@ func (s *Snake) Render(frame int) {
 	frame = frame % period
 	segment := s.Head
 	for segment != nil {
-		segment.Render(frame)
+		segment.Render(frame, s.state)
 		segment = segment.Tail
 	}
 	s.renderHead()
