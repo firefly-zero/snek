@@ -71,7 +71,7 @@ func (s *Snake) Update(frame int) {
 	if pressed {
 		s.Dir = pad.Azimuth().Radians()
 	}
-	if frame == period-1 {
+	if frame == 0 {
 		s.Shift()
 	}
 }
