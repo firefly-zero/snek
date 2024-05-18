@@ -99,4 +99,21 @@ func (s *Snake) Render(frame int) {
 		segment.Render(frame)
 		segment = segment.Tail
 	}
+	s.renderHead(frame)
+}
+
+func (s *Snake) renderHead(frame int) {
+	neck := s.Head.Head
+	headLen := float64(segmentLen) / float64(period) * float64(frame)
+	shiftX := math.Cos(float64(s.Dir)) * float64(headLen)
+	shiftY := math.Sin(float64(s.Dir)) * float64(headLen)
+	mouth := firefly.Point{
+		X: neck.X + int(shiftX),
+		Y: neck.Y - int(shiftY),
+	}
+	style := firefly.LineStyle{
+		Color: firefly.ColorBlue,
+		Width: snakeWidth,
+	}
+	firefly.DrawLine(neck, mouth, style)
 }
