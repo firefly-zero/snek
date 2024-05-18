@@ -19,6 +19,7 @@ type Segment struct {
 	Tail *Segment
 }
 
+// Render the snake's segment
 func (s *Segment) Render(frame int) {
 	style := firefly.LineStyle{
 		Color: firefly.ColorBlue,
@@ -48,8 +49,12 @@ func (s *Segment) Render(frame int) {
 }
 
 type Snake struct {
+	// The start point of the first full-length segment (the neck).
 	Head *Segment
-	Dir  float32
+	// The very first point of the snake. Updated based on Dir.
+	Mouth firefly.Point
+	// The snake's movement direction in radians. Updated based on touch pad.
+	Dir float32
 }
 
 func NewSnake() *Snake {
@@ -72,11 +77,13 @@ func (s *Snake) Update(frame int) {
 		s.Dir = pad.Azimuth().Radians()
 	}
 	if frame == 0 {
-		s.Shift()
+		s.shift()
 	}
+	s.updateMouth(frame)
 }
 
-func (s *Snake) Shift() {
+// Shift forward the position of each segment.
+func (s *Snake) shift() {
 	shiftX := math.Cos(float64(s.Dir)) * float64(segmentLen)
 	shiftY := math.Sin(float64(s.Dir)) * float64(segmentLen)
 	head := firefly.Point{
@@ -92,6 +99,24 @@ func (s *Snake) Shift() {
 	}
 }
 
+func (s *Snake) updateMouth(frame int) {
+	neck := s.Head.Head
+	headLen := float64(segmentLen) * float64(frame) / float64(period)
+	shiftX := math.Cos(float64(s.Dir)) * headLen
+	shiftY := math.Sin(float64(s.Dir)) * headLen
+	s.Mouth = firefly.Point{
+		X: neck.X + int(shiftX),
+		Y: neck.Y - int(shiftY),
+	}
+}
+
+// Check if the snake can eat the apple.
+//
+// If it can, start growing the snake.
+func (s *Snake) TryEat(a Apple) bool {
+	return false
+}
+
 func (s *Snake) Render(frame int) {
 	frame = frame % period
 	segment := s.Head
@@ -99,21 +124,14 @@ func (s *Snake) Render(frame int) {
 		segment.Render(frame)
 		segment = segment.Tail
 	}
-	s.renderHead(frame)
+	s.renderHead()
 }
 
-func (s *Snake) renderHead(frame int) {
-	neck := s.Head.Head
-	headLen := float64(segmentLen) / float64(period) * float64(frame)
-	shiftX := math.Cos(float64(s.Dir)) * float64(headLen)
-	shiftY := math.Sin(float64(s.Dir)) * float64(headLen)
-	mouth := firefly.Point{
-		X: neck.X + int(shiftX),
-		Y: neck.Y - int(shiftY),
-	}
+// Draw the zero segment of the snake: it's head.
+func (s *Snake) renderHead() {
 	style := firefly.LineStyle{
 		Color: firefly.ColorBlue,
 		Width: snakeWidth,
 	}
-	firefly.DrawLine(neck, mouth, style)
+	firefly.DrawLine(s.Head.Head, s.Mouth, style)
 }
