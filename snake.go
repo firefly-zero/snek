@@ -10,6 +10,7 @@ const (
 	period     = 10
 	snakeWidth = 8
 	segmentLen = 16
+	maxDirDiff = .1
 )
 
 type State uint8
@@ -92,7 +93,10 @@ func (s *Snake) Update(frame int) {
 	frame = frame % period
 	pad, pressed := firefly.ReadPad(firefly.Player0)
 	if pressed {
-		s.Dir = pad.Azimuth().Radians()
+		dirDiff := pad.Azimuth().Radians() - s.Dir
+		if !math.IsNaN(float64(dirDiff)) {
+			s.Dir += dirDiff
+		}
 	}
 	if frame == 0 {
 		s.shift()
