@@ -189,9 +189,21 @@ func (s *Snake) Render(frame int) {
 
 // Draw the zero segment of the snake: it's head.
 func (s *Snake) renderHead() {
+	neck := s.Head.Head
 	style := firefly.LineStyle{
 		Color: firefly.ColorBlue,
 		Width: snakeWidth,
 	}
-	firefly.DrawLine(s.Head.Head, s.Mouth, style)
+	firefly.DrawLine(neck, s.Mouth, style)
+
+	firefly.DrawCircle(
+		firefly.Point{
+			X: neck.X - snakeWidth/2,
+			Y: neck.Y - snakeWidth/2,
+		},
+		snakeWidth,
+		firefly.Style{
+			FillColor: firefly.ColorBlue,
+		},
+	)
 }
