@@ -1,9 +1,8 @@
 package main
 
 import (
-	"math"
-
 	"github.com/firefly-zero/firefly-go/firefly"
+	"github.com/orsinium-labs/tinymath"
 )
 
 const (
@@ -94,7 +93,7 @@ func (s *Snake) Update(frame int) {
 	pad, pressed := firefly.ReadPad(firefly.Player0)
 	if pressed {
 		dirDiff := pad.Azimuth().Radians() - s.Dir
-		if !math.IsNaN(float64(dirDiff)) {
+		if !tinymath.IsNaN(float32(dirDiff)) {
 			s.Dir += dirDiff
 		}
 	}
@@ -106,8 +105,8 @@ func (s *Snake) Update(frame int) {
 
 // Shift forward the position of each segment.
 func (s *Snake) shift() {
-	shiftX := math.Cos(float64(s.Dir)) * float64(segmentLen)
-	shiftY := math.Sin(float64(s.Dir)) * float64(segmentLen)
+	shiftX := tinymath.Cos(s.Dir) * segmentLen
+	shiftY := tinymath.Sin(s.Dir) * segmentLen
 	head := firefly.Point{
 		X: s.Head.Head.X + int(shiftX),
 		Y: s.Head.Head.Y - int(shiftY),
@@ -135,9 +134,9 @@ func (s *Snake) shift() {
 
 func (s *Snake) updateMouth(frame int) {
 	neck := s.Head.Head
-	headLen := float64(segmentLen) * float64(frame) / float64(period)
-	shiftX := math.Cos(float64(s.Dir)) * headLen
-	shiftY := math.Sin(float64(s.Dir)) * headLen
+	headLen := float32(segmentLen) * float32(frame) / float32(period)
+	shiftX := tinymath.Cos(s.Dir) * headLen
+	shiftY := tinymath.Sin(s.Dir) * headLen
 	s.Mouth = firefly.Point{
 		X: neck.X + int(shiftX),
 		Y: neck.Y - int(shiftY),
@@ -150,7 +149,7 @@ func (s *Snake) updateMouth(frame int) {
 func (s *Snake) TryEat(a *Apple) {
 	x := a.Pos.X - s.Mouth.X
 	y := a.Pos.Y - s.Mouth.Y
-	distance := math.Sqrt(float64(x*x + y*y))
+	distance := tinymath.Hypot(float32(x), float32(y))
 	if distance > appleRadius {
 		return
 	}
