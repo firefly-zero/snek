@@ -170,7 +170,7 @@ func (s *Snake) TryEat(a *Apple) {
 	x := a.Pos.X - s.Mouth.X
 	y := a.Pos.Y - s.Mouth.Y
 	distance := tinymath.Hypot(float32(x), float32(y))
-	if distance > appleRadius {
+	if distance > appleRadius+snakeWidth/2 {
 		return
 	}
 	s.state = Eating
@@ -190,20 +190,25 @@ func (s *Snake) Render(frame int) {
 // Draw the zero segment of the snake: it's head.
 func (s *Snake) renderHead() {
 	neck := s.Head.Head
-	style := firefly.LineStyle{
+	lineStyle := firefly.LineStyle{
 		Color: firefly.ColorBlue,
 		Width: snakeWidth,
 	}
-	firefly.DrawLine(neck, s.Mouth, style)
+	firefly.DrawLine(neck, s.Mouth, lineStyle)
 
+	style := firefly.Style{FillColor: firefly.ColorBlue}
 	firefly.DrawCircle(
 		firefly.Point{
 			X: neck.X - snakeWidth/2,
 			Y: neck.Y - snakeWidth/2,
 		},
-		snakeWidth,
-		firefly.Style{
-			FillColor: firefly.ColorBlue,
+		snakeWidth, style,
+	)
+	firefly.DrawCircle(
+		firefly.Point{
+			X: s.Mouth.X - snakeWidth/2,
+			Y: s.Mouth.Y - snakeWidth/2,
 		},
+		snakeWidth, style,
 	)
 }
