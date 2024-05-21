@@ -92,15 +92,35 @@ func (s *Snake) Update(frame int) {
 	frame = frame % period
 	pad, pressed := firefly.ReadPad(firefly.Player0)
 	if pressed {
-		dirDiff := pad.Azimuth().Radians() - s.Dir
-		if !tinymath.IsNaN(float32(dirDiff)) {
-			s.Dir += dirDiff
-		}
+		s.setDir(pad)
 	}
 	if frame == 0 {
 		s.shift()
 	}
 	s.updateMouth(frame)
+}
+
+// Set Dir value based on the pad input.
+func (s *Snake) setDir(pad firefly.Pad) {
+	dirDiff := pad.Azimuth().Radians() - s.Dir
+	if tinymath.IsNaN(dirDiff) {
+		return
+	}
+
+	// The turn is TOO drastic, just do it.
+	if dirDiff > tinymath.Pi || dirDiff < -tinymath.Pi {
+		s.Dir += dirDiff
+		return
+	}
+
+	// Smoothen the turn.
+	if dirDiff > maxDirDiff {
+		s.Dir += maxDirDiff
+	} else if dirDiff < -maxDirDiff {
+		s.Dir -= maxDirDiff
+	} else {
+		s.Dir += dirDiff
+	}
 }
 
 // Shift forward the position of each segment.
