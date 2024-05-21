@@ -107,10 +107,13 @@ func (s *Snake) setDir(pad firefly.Pad) {
 		return
 	}
 
-	// The turn is TOO drastic, just do it.
-	if dirDiff > tinymath.Pi || dirDiff < -tinymath.Pi {
-		s.Dir += dirDiff
-		return
+	// If the turn is more than 180 degrees, we're rotating in a wrong direction.
+	// Switch the direction.
+	if dirDiff > tinymath.Pi {
+		dirDiff = -maxDirDiff
+	}
+	if dirDiff < -tinymath.Pi {
+		dirDiff = maxDirDiff
 	}
 
 	// Smoothen the turn.
@@ -120,6 +123,14 @@ func (s *Snake) setDir(pad firefly.Pad) {
 		s.Dir -= maxDirDiff
 	} else {
 		s.Dir += dirDiff
+	}
+
+	// Ensure that the direction is always on the 0-360 degrees range.
+	if s.Dir < 0 {
+		s.Dir = tinymath.Tau - s.Dir
+	}
+	if s.Dir > tinymath.Tau {
+		s.Dir = s.Dir - tinymath.Tau
 	}
 }
 
