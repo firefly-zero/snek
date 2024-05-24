@@ -149,6 +149,7 @@ func (s *Snake) shift() {
 			Tail: s.Head,
 		}
 		s.state = Moving
+		return
 	}
 	if s.state == Eating {
 		s.state = Growing
