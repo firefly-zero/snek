@@ -167,18 +167,19 @@ func (s *Snake) updateMouth(frame int) {
 // Check if the snake can eat the apple.
 //
 // If it can, start growing the snake and move the apple.
-func (s *Snake) TryEat(a *Apple) {
-	x := a.Pos.X - s.Mouth.X
-	y := a.Pos.Y - s.Mouth.Y
+func (s *Snake) TryEat(apple *Apple, score *Score) {
+	x := apple.Pos.X - s.Mouth.X
+	y := apple.Pos.Y - s.Mouth.Y
 	distance := tinymath.Hypot(float32(x), float32(y))
 	if distance > appleRadius+snakeWidth/2 {
 		return
 	}
 	s.state = Eating
-	a.Move()
+	apple.Move()
+	score.Inc()
 	// Don't place the apple inside the snake
-	for s.Collides(a.Pos) {
-		a.Move()
+	for s.Collides(apple.Pos) {
+		apple.Move()
 	}
 }
 

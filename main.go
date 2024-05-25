@@ -5,6 +5,7 @@ import (
 )
 
 var frame = 0
+var font firefly.Font
 
 func init() {
 	firefly.Boot = boot
@@ -13,18 +14,22 @@ func init() {
 }
 
 func boot() {
+	font = firefly.LoadROMFile("font").Font()
 	apple = NewApple()
 	snake = NewSnake()
+	score = NewScore()
 }
 
 func update() {
 	frame += 1
 	snake.Update(frame)
-	snake.TryEat(&apple)
+	snake.TryEat(&apple, &score)
+	score.Update(snake)
 }
 
 func render() {
 	firefly.ClearScreen(firefly.ColorWhite)
 	apple.Render()
 	snake.Render(frame)
+	score.Render()
 }
