@@ -76,6 +76,7 @@ func NewSnake() *Snake {
 	}
 }
 
+// Update the position of all snake's segments.
 func (s *Snake) Update(frame int) {
 	frame = frame % period
 	pad, pressed := firefly.ReadPad(firefly.Player0)
@@ -152,6 +153,7 @@ func (s *Snake) shift() {
 	}
 }
 
+// Update snake's mouth position based on the current frame and direction.
 func (s *Snake) updateMouth(frame int) {
 	neck := s.Head.Head
 	headLen := float32(segmentLen) * float32(frame) / float32(period)
@@ -176,7 +178,8 @@ func (s *Snake) TryEat(a *Apple) {
 	a.Move()
 }
 
-func (s *Snake) Render(frame int) {
+// Render all segments and the head of the snake
+func (s Snake) Render(frame int) {
 	frame = frame % period
 	segment := s.Head
 	for segment != nil {
@@ -187,7 +190,7 @@ func (s *Snake) Render(frame int) {
 }
 
 // Draw the zero segment of the snake: it's head.
-func (s *Snake) renderHead() {
+func (s Snake) renderHead() {
 	neck := s.Head.Head
 	mouth := s.Mouth
 	neck.X, mouth.X = denormalizeX(neck.X, mouth.X)
@@ -203,6 +206,7 @@ func (s *Snake) renderHead() {
 	)
 }
 
+// Render the segment and ghost segments if the snake wraps around the screen edges.
 func drawSegment(start, end firefly.Point) {
 	drawSegmentExactlyAt(start, end)
 	drawSegmentExactlyAt(
@@ -219,6 +223,7 @@ func drawSegment(start, end firefly.Point) {
 	)
 }
 
+// Render the segment.
 func drawSegmentExactlyAt(start, end firefly.Point) {
 	style := firefly.LineStyle{
 		Color: firefly.ColorBlue,
