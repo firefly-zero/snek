@@ -125,8 +125,8 @@ func (s *Snake) shift() {
 	shiftX := tinymath.Cos(s.Dir) * segmentLen
 	shiftY := tinymath.Sin(s.Dir) * segmentLen
 	head := firefly.Point{
-		X: s.Head.Head.X + int(shiftX),
-		Y: s.Head.Head.Y - int(shiftY),
+		X: normalizeX(s.Head.Head.X + int(shiftX)),
+		Y: normalizeY(s.Head.Head.Y - int(shiftY)),
 	}
 
 	if s.state == Growing {
@@ -155,10 +155,9 @@ func (s *Snake) updateMouth(frame int) {
 	headLen := float32(segmentLen) * float32(frame) / float32(period)
 	shiftX := tinymath.Cos(s.Dir) * headLen
 	shiftY := tinymath.Sin(s.Dir) * headLen
-	s.Mouth = firefly.Point{
-		X: neck.X + int(shiftX),
-		Y: neck.Y - int(shiftY),
-	}
+	x := normalizeX(neck.X + int(shiftX))
+	y := normalizeY(neck.Y - int(shiftY))
+	s.Mouth = firefly.Point{X: x, Y: y}
 }
 
 // Check if the snake can eat the apple.
@@ -215,4 +214,22 @@ func drawSegment(start, end firefly.Point) {
 			FillColor: firefly.ColorBlue,
 		},
 	)
+}
+
+func normalizeX(x int) int {
+	if x > firefly.Width {
+		x -= firefly.Width
+	} else if x < 0 {
+		x += firefly.Width
+	}
+	return x
+}
+
+func normalizeY(y int) int {
+	if y > firefly.Height {
+		y -= firefly.Height
+	} else if y < 0 {
+		y += firefly.Height
+	}
+	return y
 }
