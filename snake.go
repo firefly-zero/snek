@@ -176,6 +176,29 @@ func (s *Snake) TryEat(a *Apple) {
 	}
 	s.state = Eating
 	a.Move()
+	// Don't place the apple inside the snake
+	for s.Collides(a.Pos) {
+		a.Move()
+	}
+}
+
+// Check if the given point is within the snake's body
+func (s Snake) Collides(p firefly.Point) bool {
+	segment := s.Head.Tail
+	for segment != nil {
+		if segment.Tail != nil {
+			ph := segment.Head
+			pt := segment.Tail.Head
+			ph.X, pt.X = denormalizeX(ph.X, pt.X)
+			ph.Y, pt.Y = denormalizeY(ph.Y, pt.Y)
+			bbox := NewBBox(ph, pt, snakeWidth/2)
+			if bbox.Contains(p) {
+				return true
+			}
+		}
+		segment = segment.Tail
+	}
+	return false
 }
 
 // Render all segments and the head of the snake
@@ -197,6 +220,9 @@ func (s Snake) renderHead() {
 	neck.Y, mouth.Y = denormalizeY(neck.Y, mouth.Y)
 	drawSegment(neck, mouth)
 	style := firefly.Style{FillColor: firefly.ColorLightBlue}
+	if s.Collides(mouth) {
+		style.FillColor = firefly.ColorRed
+	}
 	firefly.DrawCircle(
 		firefly.Point{
 			X: mouth.X - snakeWidth/2,
