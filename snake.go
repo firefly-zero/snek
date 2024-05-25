@@ -40,10 +40,12 @@ func (s *Segment) Render(frame int, state State) {
 	}
 	start := s.Head
 	end := s.Tail.Head
+	start.X, end.X = denormalizeX(start.X, end.X)
+	start.Y, end.Y = denormalizeY(start.Y, end.Y)
 	// if this is the last segment (the snake's tail), draw it shorter.
 	if s.Tail.Tail == nil && state != Growing {
-		end.X = start.X + ((end.X - start.X) * (period - frame) / period)
-		end.Y = start.Y + ((end.Y - start.Y) * (period - frame) / period)
+		end.X = start.X + (end.X-start.X)*(period-frame)/period
+		end.Y = start.Y + (end.Y-start.Y)*(period-frame)/period
 	}
 	drawSegment(start, end)
 }
@@ -187,31 +189,21 @@ func (s *Snake) Render(frame int) {
 // Draw the zero segment of the snake: it's head.
 func (s *Snake) renderHead() {
 	neck := s.Head.Head
-	drawSegment(neck, s.Mouth)
+	mouth := s.Mouth
+	neck.X, mouth.X = denormalizeX(neck.X, mouth.X)
+	neck.Y, mouth.Y = denormalizeY(neck.Y, mouth.Y)
+	drawSegment(neck, mouth)
 	style := firefly.Style{FillColor: firefly.ColorLightBlue}
 	firefly.DrawCircle(
 		firefly.Point{
-			X: s.Mouth.X - snakeWidth/2,
-			Y: s.Mouth.Y - snakeWidth/2,
+			X: mouth.X - snakeWidth/2,
+			Y: mouth.Y - snakeWidth/2,
 		},
 		snakeWidth, style,
 	)
 }
 
 func drawSegment(start, end firefly.Point) {
-	// If the points are on the opposite sides of the screen,
-	// put the left (upper) one on the right (lower) side outside the screen.
-	if start.X-end.X > 30 {
-		end.X += firefly.Width
-	} else if end.X-start.X > 30 {
-		start.X += firefly.Width
-	}
-	if start.Y-end.Y > 30 {
-		end.Y += firefly.Height
-	} else if end.Y-start.Y > 30 {
-		start.Y += firefly.Height
-	}
-
 	drawSegmentExactlyAt(start, end)
 	drawSegmentExactlyAt(
 		firefly.Point{X: start.X - firefly.Width, Y: start.Y},
@@ -247,7 +239,7 @@ func drawSegmentExactlyAt(start, end firefly.Point) {
 
 // If x points outside the screen, shift it so that it's back on the screen.
 func normalizeX(x int) int {
-	if x > firefly.Width {
+	if x >= firefly.Width {
 		x -= firefly.Width
 	} else if x < 0 {
 		x += firefly.Width
@@ -257,10 +249,32 @@ func normalizeX(x int) int {
 
 // If y points outside the screen, shift it so that it's back on the screen.
 func normalizeY(y int) int {
-	if y > firefly.Height {
-		y -= firefly.Height
+	if y >= firefly.Height {
+		y = y - firefly.Height
 	} else if y < 0 {
 		y += firefly.Height
 	}
 	return y
+}
+
+// If the dots are on the opposite sides of the screen,
+// put the left one on the right outside the screen.
+func denormalizeX(start, end int) (int, int) {
+	if start-end > 30 {
+		end += firefly.Width
+	} else if end-start > 30 {
+		start += firefly.Width
+	}
+	return start, end
+}
+
+// If the dots are on the opposite sides of the screen,
+// put the upper one on the bottom outside the screen.
+func denormalizeY(start, end int) (int, int) {
+	if start-end > 30 {
+		end += firefly.Height
+	} else if end-start > 30 {
+		start += firefly.Height
+	}
+	return start, end
 }
