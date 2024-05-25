@@ -35,10 +35,6 @@ type Segment struct {
 
 // Render the snake's segment
 func (s *Segment) Render(frame int, state State) {
-	style := firefly.LineStyle{
-		Color: firefly.ColorBlue,
-		Width: snakeWidth,
-	}
 	if s.Tail == nil {
 		return
 	}
@@ -49,17 +45,7 @@ func (s *Segment) Render(frame int, state State) {
 		end.X = start.X + ((end.X - start.X) * (period - frame) / period)
 		end.Y = start.Y + ((end.Y - start.Y) * (period - frame) / period)
 	}
-	firefly.DrawLine(start, end, style)
-	firefly.DrawCircle(
-		firefly.Point{
-			X: end.X - snakeWidth/2,
-			Y: end.Y - snakeWidth/2,
-		},
-		snakeWidth,
-		firefly.Style{
-			FillColor: firefly.ColorBlue,
-		},
-	)
+	drawSegment(start, end)
 }
 
 type Snake struct {
@@ -202,25 +188,31 @@ func (s *Snake) Render(frame int) {
 // Draw the zero segment of the snake: it's head.
 func (s *Snake) renderHead() {
 	neck := s.Head.Head
-	lineStyle := firefly.LineStyle{
-		Color: firefly.ColorBlue,
-		Width: snakeWidth,
-	}
-	firefly.DrawLine(neck, s.Mouth, lineStyle)
-
-	style := firefly.Style{FillColor: firefly.ColorBlue}
-	firefly.DrawCircle(
-		firefly.Point{
-			X: neck.X - snakeWidth/2,
-			Y: neck.Y - snakeWidth/2,
-		},
-		snakeWidth, style,
-	)
+	drawSegment(neck, s.Mouth)
+	style := firefly.Style{FillColor: firefly.ColorLightBlue}
 	firefly.DrawCircle(
 		firefly.Point{
 			X: s.Mouth.X - snakeWidth/2,
 			Y: s.Mouth.Y - snakeWidth/2,
 		},
 		snakeWidth, style,
+	)
+}
+
+func drawSegment(start, end firefly.Point) {
+	style := firefly.LineStyle{
+		Color: firefly.ColorBlue,
+		Width: snakeWidth,
+	}
+	firefly.DrawLine(start, end, style)
+	firefly.DrawCircle(
+		firefly.Point{
+			X: end.X - snakeWidth/2,
+			Y: end.Y - snakeWidth/2,
+		},
+		snakeWidth,
+		firefly.Style{
+			FillColor: firefly.ColorBlue,
+		},
 	)
 }
