@@ -46,8 +46,9 @@ func (s *Score) dec() {
 		return
 	}
 	s.iframes = 60
+
 	if s.val > 0 {
-		s.val -= 1
+		s.val -= (s.val/5 + 1)
 	}
 }
 
@@ -56,6 +57,6 @@ func (s Score) Render() {
 	firefly.DrawText(
 		strconv.Itoa(s.val), font,
 		firefly.Point{X: 10, Y: 10},
-		firefly.ColorDarkGray,
+		firefly.ColorDarkBlue,
 	)
 }
