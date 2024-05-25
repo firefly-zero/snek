@@ -8,17 +8,13 @@ type BBox struct {
 }
 
 func NewBBox(start, end firefly.Point, margin int) BBox {
-	if end.X < start.X {
-		start.X, end.X = end.X, start.X
-	}
-	if end.Y < start.Y {
-		start.Y, end.Y = end.Y, start.Y
-	}
-	start.X -= margin
-	end.X += margin
-	start.Y -= margin
-	end.Y += margin
-	return BBox{left: start, right: end}
+	left := start.ComponentMin(end)
+	right := start.ComponentMin(end)
+	left.X -= margin
+	right.X += margin
+	left.Y -= margin
+	right.Y += margin
+	return BBox{left: left, right: right}
 }
 
 func (b BBox) Contains(p firefly.Point) bool {

@@ -251,11 +251,13 @@ func drawSegment(start, end firefly.Point) {
 
 // Render the segment.
 func drawSegmentExactlyAt(start, end firefly.Point) {
-	style := firefly.LineStyle{
-		Color: firefly.ColorBlue,
-		Width: snakeWidth,
-	}
-	firefly.DrawLine(start, end, style)
+	firefly.DrawLine(
+		start, end,
+		firefly.LineStyle{
+			Color: firefly.ColorBlue,
+			Width: snakeWidth,
+		},
+	)
 	firefly.DrawCircle(
 		firefly.Point{
 			X: end.X - snakeWidth/2,
