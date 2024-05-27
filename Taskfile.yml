@@ -1,0 +1,20 @@
+# https://taskfile.dev
+version: '3'
+
+tasks:
+  build:
+    desc: build ROM
+    cmds:
+      - firefly_cli build
+      - firefly_cli export
+  release:
+    desc: build and publish release
+    cmds:
+      - task: build
+      - test {{.CLI_ARGS}}
+      - git tag {{.CLI_ARGS}}
+      - git push
+      - git push --tags
+      - gh release create --generate-notes {{.CLI_ARGS}}
+      - gh release upload {{.CLI_ARGS}} firefly.snek.zip
+
