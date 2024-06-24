@@ -7,7 +7,7 @@ Snake-inspired game with 360° movement. Written in Go for [Firefly Zero](https:
 Install from the [catalog](https://catalog.fireflyzero.com/) using [firefly-cli](https://github.com/firefly-zero/firefly-cli):
 
 ```bash
-firefly_cli import firefly.snek
+firefly_cli import lux.snek
 ```
 
 Build and install from source:
