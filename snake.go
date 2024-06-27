@@ -57,6 +57,11 @@ type Snake struct {
 	// The very first point of the snake. Updated based on Dir.
 	Mouth firefly.Point
 
+	// The point the snake is looking at.
+	Eye          firefly.Point
+	BlinkCounter int // The timer for the snake's eye blinking.
+	BlinkMaxTime int
+
 	// The snake's movement direction in radians. Updated based on touch pad.
 	Dir float32
 
@@ -77,7 +82,7 @@ func NewSnake() *Snake {
 }
 
 // Update the position of all snake's segments.
-func (s *Snake) Update(frame int) {
+func (s *Snake) Update(frame int, apple *Apple) {
 	frame = frame % period
 	pad, pressed := firefly.ReadPad(firefly.Player0)
 	if pressed {
@@ -87,6 +92,7 @@ func (s *Snake) Update(frame int) {
 		s.shift()
 	}
 	s.updateMouth(frame)
+	s.updateEye(apple.Pos)
 }
 
 // Set Dir value based on the pad input.
@@ -120,6 +126,27 @@ func (s *Snake) setDir(pad firefly.Pad) {
 	}
 	if s.Dir > tinymath.Tau {
 		s.Dir = s.Dir - tinymath.Tau
+	}
+}
+
+// Make the snake look at the apple.
+func (s *Snake) updateEye(apple firefly.Point) {
+	// Calculate position of eye based on the where the apple is
+	lookX := float32(apple.X - s.Mouth.X)
+	lookY := float32(apple.Y - s.Mouth.Y)
+	lookLen := tinymath.Hypot(lookX, lookY)
+	dX := lookX * 3 / lookLen
+	dY := lookY * 3 / lookLen
+
+	s.Eye = firefly.Point{
+		X: s.Mouth.X + int(dX),
+		Y: s.Mouth.Y + int(dY),
+	}
+
+	s.BlinkCounter += int(firefly.GetRandom() % 5)
+	if s.BlinkCounter > s.BlinkMaxTime {
+		s.BlinkCounter = 0
+		s.BlinkMaxTime = int(100 + firefly.GetRandom()%100)
 	}
 }
 
@@ -220,17 +247,55 @@ func (s Snake) renderHead() {
 	neck.X, mouth.X = denormalizeX(neck.X, mouth.X)
 	neck.Y, mouth.Y = denormalizeY(neck.Y, mouth.Y)
 	drawSegment(neck, mouth)
-	style := firefly.Style{FillColor: firefly.ColorLightBlue}
+	style := firefly.Style{FillColor: firefly.ColorWhite}
 	if s.Collides(mouth) {
 		style.FillColor = firefly.ColorRed
 	}
+
+	firefly.DrawCircle(
+		firefly.Point{
+			X: mouth.X - snakeWidth/2 - 1,
+			Y: mouth.Y - snakeWidth/2 - 1,
+		},
+		snakeWidth+2, firefly.Style{FillColor: firefly.ColorBlue},
+	)
 	firefly.DrawCircle(
 		firefly.Point{
 			X: mouth.X - snakeWidth/2,
 			Y: mouth.Y - snakeWidth/2,
 		},
-		snakeWidth, style,
+		snakeWidth, firefly.Style{FillColor: firefly.ColorLightBlue},
 	)
+	firefly.DrawCircle(
+		firefly.Point{
+			X: s.Mouth.X - snakeWidth/2 + 1,
+			Y: s.Mouth.Y - snakeWidth/2 + 1,
+		},
+		snakeWidth-2, style,
+	)
+
+	s.renderEye()
+}
+
+// Draw the snake's eye.
+func (s Snake) renderEye() {
+	firefly.DrawCircle(
+		firefly.Point{
+			X: s.Eye.X - snakeWidth/8,
+			Y: s.Eye.Y - snakeWidth/8,
+		},
+		snakeWidth/4, firefly.Style{FillColor: firefly.ColorBlack},
+	)
+
+	if s.BlinkCounter < 20 {
+		firefly.DrawCircle(
+			firefly.Point{
+				X: s.Mouth.X - snakeWidth/2 + 1,
+				Y: s.Mouth.Y - snakeWidth/2 + 1,
+			},
+			snakeWidth-2, firefly.Style{FillColor: firefly.ColorLightBlue},
+		)
+	}
 }
 
 // Render the segment and ghost segments if the snake wraps around the screen edges.
