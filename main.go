@@ -22,7 +22,7 @@ func boot() {
 
 func update() {
 	frame += 1
-	snake.Update(frame)
+	snake.Update(frame, &apple)
 	snake.TryEat(&apple, &score)
 	score.Update(snake)
 }
