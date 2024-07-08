@@ -72,12 +72,13 @@ type Snake struct {
 }
 
 func NewSnake(peer firefly.Peer) *Snake {
+	shift := 10 + snakeWidth + int(peer)*20
 	return &Snake{
 		Peer: peer,
 		Head: &Segment{
-			Head: firefly.Point{X: segmentLen * 2, Y: 10 + snakeWidth},
+			Head: firefly.Point{X: segmentLen * 2, Y: shift},
 			Tail: &Segment{
-				Head: firefly.Point{X: segmentLen, Y: 10 + snakeWidth},
+				Head: firefly.Point{X: segmentLen, Y: shift},
 				Tail: nil,
 			},
 		},

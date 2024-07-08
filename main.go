@@ -18,8 +18,8 @@ func boot() {
 	apple = NewApple()
 	peers := firefly.GetPeers()
 	snakes = make([]*Snake, peers.Len())
-	for _, peer := range peers.Slice() {
-		NewSnake(peer)
+	for i, peer := range peers.Slice() {
+		snakes[i] = NewSnake(peer)
 	}
 	score = NewScore()
 }
