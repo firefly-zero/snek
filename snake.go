@@ -26,7 +26,7 @@ const (
 	Growing State = 2
 )
 
-var snake *Snake
+var snakes []*Snake
 
 type Segment struct {
 	Head firefly.Point
