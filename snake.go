@@ -51,6 +51,8 @@ func (s *Segment) Render(frame int, state State) {
 }
 
 type Snake struct {
+	Peer firefly.Peer
+
 	// The start point of the first full-length segment (the neck).
 	Head *Segment
 
@@ -69,8 +71,9 @@ type Snake struct {
 	state State
 }
 
-func NewSnake() *Snake {
+func NewSnake(peer firefly.Peer) *Snake {
 	return &Snake{
+		Peer: peer,
 		Head: &Segment{
 			Head: firefly.Point{X: segmentLen * 2, Y: 10 + snakeWidth},
 			Tail: &Segment{
@@ -84,7 +87,7 @@ func NewSnake() *Snake {
 // Update the position of all snake's segments.
 func (s *Snake) Update(frame int, apple *Apple) {
 	frame = frame % period
-	pad, pressed := firefly.ReadPad(firefly.Player0)
+	pad, pressed := firefly.ReadPad(s.Peer)
 	if pressed {
 		s.setDir(pad)
 	}

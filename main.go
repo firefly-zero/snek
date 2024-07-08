@@ -16,7 +16,7 @@ func init() {
 func boot() {
 	font = firefly.LoadROMFile("font").Font()
 	apple = NewApple()
-	snake = NewSnake()
+	snake = NewSnake(0)
 	score = NewScore()
 }
 
