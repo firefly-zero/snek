@@ -16,20 +16,28 @@ func init() {
 func boot() {
 	font = firefly.LoadROMFile("font").Font()
 	apple = NewApple()
-	snake = NewSnake()
+	peers := firefly.GetPeers()
+	snakes = make([]*Snake, peers.Len())
+	for i, peer := range peers.Slice() {
+		snakes[i] = NewSnake(peer)
+	}
 	score = NewScore()
 }
 
 func update() {
 	frame += 1
-	snake.Update(frame, &apple)
-	snake.TryEat(&apple, &score)
-	score.Update(snake)
+	for _, snake := range snakes {
+		snake.Update(frame, &apple)
+		snake.TryEat(&apple, &score)
+		score.Update(snake)
+	}
 }
 
 func render() {
 	firefly.ClearScreen(firefly.ColorWhite)
 	apple.Render()
-	snake.Render(frame)
+	for _, snake := range snakes {
+		snake.Render(frame)
+	}
 	score.Render()
 }
