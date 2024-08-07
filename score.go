@@ -6,10 +6,10 @@ import (
 	"github.com/firefly-zero/firefly-go/firefly"
 )
 
-// How long the snake can go without food.
-const HungerPeriod = 5 * 60
+// How long (in frames) the snake can go without food.
+const HungerPeriod = 6 * 60
 
-// For how long the snake is invulnerable after a collision.
+// For how long (in frames) the snake is invulnerable after a collision.
 const IFrames = 60
 
 var score Score
@@ -44,13 +44,13 @@ func (s *Score) Update(snake *Snake) {
 	}
 	if s.hunger == 0 {
 		// Hungry. Decrese the score and start counting again.
-		s.dec()
+		s.Dec()
 		s.hunger = HungerPeriod
 	} else {
 		s.hunger -= 1
 	}
 	if snake.Collides(snake.Mouth) {
-		score.dec()
+		score.Dec()
 	}
 }
 
@@ -62,10 +62,10 @@ func (s *Score) Inc() {
 	s.val += 1
 }
 
-// Decreas the score.
+// Decrease the score.
 //
 // Triggered by the score itself when the snake collides with itself.
-func (s *Score) dec() {
+func (s *Score) Dec() {
 	if s.iframes > 0 {
 		return
 	}

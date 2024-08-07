@@ -5,3 +5,8 @@ app_name = "Snek"
 
 [files]
 font = { path = "font.fff", url = "https://fonts.fireflyzero.com/fonts/ascii/eg_4x6.fff", sha256 = "dd90ec6478b7cab75e73abde35e76ef3e7e08a2682be83a5ef859607e41e4e68" }
+
+[cheats]
+move-apple = 1 # Move apple into a new random position
+inc-score = 2  # Increment the score by the given value
+dec-score = 3  # Decrement the score by the given value
