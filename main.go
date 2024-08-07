@@ -11,6 +11,7 @@ func init() {
 	firefly.Boot = boot
 	firefly.Update = update
 	firefly.Render = render
+	firefly.Cheat = cheat
 }
 
 func boot() {
@@ -40,4 +41,24 @@ func render() {
 		snake.Render(frame)
 	}
 	score.Render()
+}
+
+func cheat(c, v int) int {
+	switch c {
+	case 1:
+		apple.Move()
+		return 1
+	case 2:
+		for i := 0; i < int(v); i++ {
+			score.Inc()
+		}
+		return score.val
+	case 3:
+		for i := 0; i < int(v); i++ {
+			score.Dec()
+		}
+		return score.val
+	default:
+		return 0
+	}
 }
