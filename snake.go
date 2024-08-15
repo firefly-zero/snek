@@ -110,8 +110,7 @@ func (s *Snake) setDir(pad firefly.Pad) {
 	// Switch the direction.
 	if dirDiff > tinymath.Pi {
 		dirDiff = -maxDirDiff
-	}
-	if dirDiff < -tinymath.Pi {
+	} else if dirDiff < -tinymath.Pi {
 		dirDiff = maxDirDiff
 	}
 
@@ -126,7 +125,7 @@ func (s *Snake) setDir(pad firefly.Pad) {
 
 	// Ensure that the direction is always on the 0-360 degrees range.
 	if s.Dir < 0 {
-		s.Dir = tinymath.Tau - s.Dir
+		s.Dir = s.Dir + tinymath.Tau
 	}
 	if s.Dir > tinymath.Tau {
 		s.Dir = s.Dir - tinymath.Tau
