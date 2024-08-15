@@ -7,8 +7,8 @@ import (
 
 const (
 	period     = 10
-	snakeWidth = 8
-	segmentLen = 16
+	snakeWidth = 7
+	segmentLen = 14
 	maxDirDiff = .1
 )
 
