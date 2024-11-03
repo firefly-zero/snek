@@ -10,3 +10,8 @@ font = { path = "font.fff", url = "https://fonts.fireflyzero.com/fonts/ascii/eg_
 move-apple = 1 # Move apple into a new random position
 inc-score = 2  # Increment the score by the given value
 dec-score = 3  # Decrement the score by the given value
+
+[badges]
+1 = { name = "m i tasti", descr = "bite yourself" }
+2 = { name = "u r tasti", descr = "bite someone else" }
+3 = { name = "apel tasti", descr = "eat 100 apples", steps = 100 }
