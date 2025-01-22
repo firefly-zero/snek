@@ -7,7 +7,6 @@ import (
 )
 
 const (
-
 	// How long (in frames) the snake can go without food.
 	HungerPeriod = 6 * 60
 
@@ -57,7 +56,7 @@ func (s *Score) Update(snake *Snake) {
 		s.hunger -= 1
 	}
 	if snake.Collides(snake.Mouth) {
-		firefly.AddProgress(BadgeBiteSelf, 1)
+		firefly.AddProgress(snake.Peer, BadgeBiteSelf, 1)
 		score.Dec()
 	}
 }
@@ -68,7 +67,7 @@ func (s *Score) Update(snake *Snake) {
 func (s *Score) Inc() {
 	s.hunger = HungerPeriod
 	s.val += 1
-	firefly.AddProgress(BadgeEat100Apples, 1)
+	firefly.AddProgress(firefly.Combined, BadgeEat100Apples, 1)
 }
 
 // Decrease the score.

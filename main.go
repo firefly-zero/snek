@@ -15,7 +15,7 @@ func init() {
 }
 
 func boot() {
-	font = firefly.LoadFile("font").Font()
+	font = firefly.LoadFile("font", nil).Font()
 	apple = NewApple()
 	peers := firefly.GetPeers()
 	snakes = make([]*Snake, peers.Len())
