@@ -5,6 +5,7 @@ app_name = "Snek"
 
 [files]
 font = { path = "font.fff", url = "https://fonts.fireflyzero.com/fonts/ascii/eg_4x6.fff", sha256 = "dd90ec6478b7cab75e73abde35e76ef3e7e08a2682be83a5ef859607e41e4e68" }
+_splash = { path = "splash.png" }
 
 [cheats]
 move-apple = 1 # Move apple into a new random position
