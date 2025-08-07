@@ -199,10 +199,12 @@ func (s *Snake) updateMouth(frame int) {
 //
 // If it can, start growing the snake and move the apple.
 func (s *Snake) tryEat(apple *Apple, score *Score) {
-	x := apple.pos.X - s.mouth.X
-	y := apple.pos.Y - s.mouth.Y
-	distance := tinymath.Hypot(float32(x), float32(y))
-	if distance > appleRadius+snakeWidth/2 {
+	const minDist = (appleRadius + snakeWidth) / 2
+	const minDist2 = minDist * minDist
+	x := float32(apple.pos.X - s.mouth.X)
+	y := float32(apple.pos.Y - s.mouth.Y)
+	dist2 := x*x + y*y
+	if dist2 > minDist2 {
 		return
 	}
 	s.state = eating
