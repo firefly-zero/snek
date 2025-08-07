@@ -9,46 +9,46 @@ var font firefly.Font
 
 func Boot() {
 	font = firefly.LoadFile("font", nil).Font()
-	apple = NewApple()
+	apple = newApple()
 	peers := firefly.GetPeers()
 	snakes = make([]*Snake, peers.Len())
 	for i, peer := range peers.Slice() {
-		snakes[i] = NewSnake(peer)
+		snakes[i] = newSnake(peer)
 	}
-	score = NewScore()
+	score = newScore()
 }
 
 func Update() {
 	frame += 1
 	for _, snake := range snakes {
-		snake.Update(frame, &apple)
-		snake.TryEat(&apple, &score)
-		score.Update(snake)
+		snake.update(frame, &apple)
+		snake.tryEat(&apple, &score)
+		score.update(snake)
 	}
 }
 
 func Render() {
 	firefly.ClearScreen(firefly.ColorWhite)
-	apple.Render()
+	apple.render()
 	for _, snake := range snakes {
-		snake.Render(frame)
+		snake.render(frame)
 	}
-	score.Render()
+	score.render()
 }
 
 func Cheat(c, v int) int {
 	switch c {
 	case 1:
-		apple.Move()
+		apple.move()
 		return 1
 	case 2:
 		for i := 0; i < int(v); i++ {
-			score.Inc()
+			score.inc()
 		}
 		return score.val
 	case 3:
 		for i := 0; i < int(v); i++ {
-			score.Dec()
+			score.dec()
 		}
 		return score.val
 	default:

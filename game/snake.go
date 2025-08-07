@@ -16,34 +16,34 @@ type State uint8
 
 const (
 	// The snake's size is stable.
-	Moving State = 0
+	moving State = 0
 
 	// The snake just eat an apple and waiting to grow.
-	Eating State = 1
+	eating State = 1
 
 	// The snake is growing.
 	// The tail is not moving and the next shift will add a segment.
-	Growing State = 2
+	growing State = 2
 )
 
 var snakes []*Snake
 
 type Segment struct {
-	Head firefly.Point
-	Tail *Segment
+	head firefly.Point
+	tail *Segment
 }
 
-// Render the snake's segment
-func (s *Segment) Render(frame int, state State) {
-	if s.Tail == nil {
+// render the snake's segment
+func (s *Segment) render(frame int, state State) {
+	if s.tail == nil {
 		return
 	}
-	start := s.Head
-	end := s.Tail.Head
+	start := s.head
+	end := s.tail.head
 	start.X, end.X = denormalizeX(start.X, end.X)
 	start.Y, end.Y = denormalizeY(start.Y, end.Y)
 	// if this is the last segment (the snake's tail), draw it shorter.
-	if s.Tail.Tail == nil && state != Growing {
+	if s.tail.tail == nil && state != growing {
 		end.X = start.X + (end.X-start.X)*(period-frame)/period
 		end.Y = start.Y + (end.Y-start.Y)*(period-frame)/period
 	}
@@ -51,44 +51,45 @@ func (s *Segment) Render(frame int, state State) {
 }
 
 type Snake struct {
-	Peer firefly.Peer
+	peer firefly.Peer
 
 	// The start point of the first full-length segment (the neck).
-	Head *Segment
+	head *Segment
 
 	// The very first point of the snake. Updated based on Dir.
-	Mouth firefly.Point
+	mouth firefly.Point
 
 	// The point the snake is looking at.
-	Eye          firefly.Point
-	BlinkCounter int // The timer for the snake's eye blinking.
-	BlinkMaxTime int
+	eye firefly.Point
+	// The timer for the snake's eye blinking.
+	blinkCounter int
+	blinkMaxTime int
 
 	// The snake's movement direction in radians. Updated based on touch pad.
-	Dir float32
+	dir float32
 
 	// Indicates if the snake is growing.
 	state State
 }
 
-func NewSnake(peer firefly.Peer) *Snake {
+func newSnake(peer firefly.Peer) *Snake {
 	shift := 10 + snakeWidth + int(peer)*20
 	return &Snake{
-		Peer: peer,
-		Head: &Segment{
-			Head: firefly.Point{X: segmentLen * 2, Y: shift},
-			Tail: &Segment{
-				Head: firefly.Point{X: segmentLen, Y: shift},
-				Tail: nil,
+		peer: peer,
+		head: &Segment{
+			head: firefly.Point{X: segmentLen * 2, Y: shift},
+			tail: &Segment{
+				head: firefly.Point{X: segmentLen, Y: shift},
+				tail: nil,
 			},
 		},
 	}
 }
 
-// Update the position of all snake's segments.
-func (s *Snake) Update(frame int, apple *Apple) {
+// update the position of all snake's segments.
+func (s *Snake) update(frame int, apple *Apple) {
 	frame = frame % period
-	pad, pressed := firefly.ReadPad(s.Peer)
+	pad, pressed := firefly.ReadPad(s.peer)
 	if pressed {
 		s.setDir(pad)
 	}
@@ -96,12 +97,12 @@ func (s *Snake) Update(frame int, apple *Apple) {
 		s.shift()
 	}
 	s.updateMouth(frame)
-	s.updateEye(apple.Pos)
+	s.updateEye(apple.pos)
 }
 
 // Set Dir value based on the pad input.
 func (s *Snake) setDir(pad firefly.Pad) {
-	dirDiff := pad.Azimuth().Radians() - s.Dir
+	dirDiff := pad.Azimuth().Radians() - s.dir
 	if tinymath.IsNaN(dirDiff) {
 		return
 	}
@@ -116,142 +117,142 @@ func (s *Snake) setDir(pad firefly.Pad) {
 
 	// Smoothen the turn.
 	if dirDiff > maxDirDiff {
-		s.Dir += maxDirDiff
+		s.dir += maxDirDiff
 	} else if dirDiff < -maxDirDiff {
-		s.Dir -= maxDirDiff
+		s.dir -= maxDirDiff
 	} else {
-		s.Dir += dirDiff
+		s.dir += dirDiff
 	}
 
 	// Ensure that the direction is always on the 0-360 degrees range.
-	if s.Dir < 0 {
-		s.Dir = s.Dir + tinymath.Tau
+	if s.dir < 0 {
+		s.dir = s.dir + tinymath.Tau
 	}
-	if s.Dir > tinymath.Tau {
-		s.Dir = s.Dir - tinymath.Tau
+	if s.dir > tinymath.Tau {
+		s.dir = s.dir - tinymath.Tau
 	}
 }
 
 // Make the snake look at the apple.
 func (s *Snake) updateEye(apple firefly.Point) {
 	// Calculate position of eye based on the where the apple is
-	lookX := float32(apple.X - s.Mouth.X)
-	lookY := float32(apple.Y - s.Mouth.Y)
+	lookX := float32(apple.X - s.mouth.X)
+	lookY := float32(apple.Y - s.mouth.Y)
 	lookLen := tinymath.Hypot(lookX, lookY)
 	dX := lookX * 3 / lookLen
 	dY := lookY * 3 / lookLen
 
-	s.Eye = firefly.Point{
-		X: s.Mouth.X + int(dX),
-		Y: s.Mouth.Y + int(dY),
+	s.eye = firefly.Point{
+		X: s.mouth.X + int(dX),
+		Y: s.mouth.Y + int(dY),
 	}
 
-	s.BlinkCounter += int(firefly.GetRandom() % 5)
-	if s.BlinkCounter > s.BlinkMaxTime {
-		s.BlinkCounter = 0
-		s.BlinkMaxTime = int(100 + firefly.GetRandom()%100)
+	s.blinkCounter += int(firefly.GetRandom() % 5)
+	if s.blinkCounter > s.blinkMaxTime {
+		s.blinkCounter = 0
+		s.blinkMaxTime = int(100 + firefly.GetRandom()%100)
 	}
 }
 
 // Shift forward the position of each segment.
 func (s *Snake) shift() {
-	shiftX := tinymath.Cos(s.Dir) * segmentLen
-	shiftY := tinymath.Sin(s.Dir) * segmentLen
+	shiftX := tinymath.Cos(s.dir) * segmentLen
+	shiftY := tinymath.Sin(s.dir) * segmentLen
 	head := firefly.Point{
-		X: normalizeX(s.Head.Head.X + int(shiftX)),
-		Y: normalizeY(s.Head.Head.Y - int(shiftY)),
+		X: normalizeX(s.head.head.X + int(shiftX)),
+		Y: normalizeY(s.head.head.Y - int(shiftY)),
 	}
 
-	if s.state == Growing {
-		s.Head = &Segment{
-			Head: head,
-			Tail: s.Head,
+	if s.state == growing {
+		s.head = &Segment{
+			head: head,
+			tail: s.head,
 		}
-		s.state = Moving
+		s.state = moving
 		return
 	}
-	if s.state == Eating {
-		s.state = Growing
+	if s.state == eating {
+		s.state = growing
 	}
 
-	segment := s.Head
+	segment := s.head
 	for segment != nil {
-		oldHead := segment.Head
-		segment.Head = head
+		oldHead := segment.head
+		segment.head = head
 		head = oldHead
-		segment = segment.Tail
+		segment = segment.tail
 	}
 }
 
 // Update snake's mouth position based on the current frame and direction.
 func (s *Snake) updateMouth(frame int) {
-	neck := s.Head.Head
+	neck := s.head.head
 	headLen := float32(segmentLen) * float32(frame) / float32(period)
-	shiftX := tinymath.Cos(s.Dir) * headLen
-	shiftY := tinymath.Sin(s.Dir) * headLen
+	shiftX := tinymath.Cos(s.dir) * headLen
+	shiftY := tinymath.Sin(s.dir) * headLen
 	x := normalizeX(neck.X + int(shiftX))
 	y := normalizeY(neck.Y - int(shiftY))
-	s.Mouth = firefly.Point{X: x, Y: y}
+	s.mouth = firefly.Point{X: x, Y: y}
 }
 
 // Check if the snake can eat the apple.
 //
 // If it can, start growing the snake and move the apple.
-func (s *Snake) TryEat(apple *Apple, score *Score) {
-	x := apple.Pos.X - s.Mouth.X
-	y := apple.Pos.Y - s.Mouth.Y
+func (s *Snake) tryEat(apple *Apple, score *Score) {
+	x := apple.pos.X - s.mouth.X
+	y := apple.pos.Y - s.mouth.Y
 	distance := tinymath.Hypot(float32(x), float32(y))
 	if distance > appleRadius+snakeWidth/2 {
 		return
 	}
-	s.state = Eating
-	apple.Move()
-	score.Inc()
+	s.state = eating
+	apple.move()
+	score.inc()
 	// Don't place the apple inside the snake
-	for s.Collides(apple.Pos) {
-		apple.Move()
+	for s.collides(apple.pos) {
+		apple.move()
 	}
 }
 
 // Check if the given point is within the snake's body
-func (s Snake) Collides(p firefly.Point) bool {
-	segment := s.Head.Tail
+func (s Snake) collides(p firefly.Point) bool {
+	segment := s.head.tail
 	for segment != nil {
-		if segment.Tail != nil {
-			ph := segment.Head
-			pt := segment.Tail.Head
+		if segment.tail != nil {
+			ph := segment.head
+			pt := segment.tail.head
 			ph.X, pt.X = denormalizeX(ph.X, pt.X)
 			ph.Y, pt.Y = denormalizeY(ph.Y, pt.Y)
-			bbox := NewBBox(ph, pt, snakeWidth/2)
-			if bbox.Contains(p) {
+			bbox := newBBox(ph, pt, snakeWidth/2)
+			if bbox.contains(p) {
 				return true
 			}
 		}
-		segment = segment.Tail
+		segment = segment.tail
 	}
 	return false
 }
 
-// Render all segments and the head of the snake
-func (s Snake) Render(frame int) {
+// render all segments and the head of the snake
+func (s Snake) render(frame int) {
 	frame = frame % period
-	segment := s.Head
+	segment := s.head
 	for segment != nil {
-		segment.Render(frame, s.state)
-		segment = segment.Tail
+		segment.render(frame, s.state)
+		segment = segment.tail
 	}
 	s.renderHead()
 }
 
 // Draw the zero segment of the snake: it's head.
 func (s Snake) renderHead() {
-	neck := s.Head.Head
-	mouth := s.Mouth
+	neck := s.head.head
+	mouth := s.mouth
 	neck.X, mouth.X = denormalizeX(neck.X, mouth.X)
 	neck.Y, mouth.Y = denormalizeY(neck.Y, mouth.Y)
 	drawSegment(neck, mouth)
 	style := firefly.Style{FillColor: firefly.ColorWhite}
-	if s.Collides(mouth) {
+	if s.collides(mouth) {
 		style.FillColor = firefly.ColorRed
 	}
 
@@ -271,8 +272,8 @@ func (s Snake) renderHead() {
 	)
 	firefly.DrawCircle(
 		firefly.Point{
-			X: s.Mouth.X - snakeWidth/2 + 1,
-			Y: s.Mouth.Y - snakeWidth/2 + 1,
+			X: s.mouth.X - snakeWidth/2 + 1,
+			Y: s.mouth.Y - snakeWidth/2 + 1,
 		},
 		snakeWidth-2, style,
 	)
@@ -284,17 +285,17 @@ func (s Snake) renderHead() {
 func (s Snake) renderEye() {
 	firefly.DrawCircle(
 		firefly.Point{
-			X: s.Eye.X - snakeWidth/8,
-			Y: s.Eye.Y - snakeWidth/8,
+			X: s.eye.X - snakeWidth/8,
+			Y: s.eye.Y - snakeWidth/8,
 		},
 		snakeWidth/4, firefly.Style{FillColor: firefly.ColorBlack},
 	)
 
-	if s.BlinkCounter < 20 {
+	if s.blinkCounter < 20 {
 		firefly.DrawCircle(
 			firefly.Point{
-				X: s.Mouth.X - snakeWidth/2 + 1,
-				Y: s.Mouth.Y - snakeWidth/2 + 1,
+				X: s.mouth.X - snakeWidth/2 + 1,
+				Y: s.mouth.Y - snakeWidth/2 + 1,
 			},
 			snakeWidth-2, firefly.Style{FillColor: firefly.ColorLightBlue},
 		)

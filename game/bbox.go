@@ -7,7 +7,7 @@ type BBox struct {
 	right firefly.Point
 }
 
-func NewBBox(start, end firefly.Point, margin int) BBox {
+func newBBox(start, end firefly.Point, margin int) BBox {
 	left := start.ComponentMin(end)
 	right := start.ComponentMin(end)
 	left.X -= margin
@@ -17,7 +17,7 @@ func NewBBox(start, end firefly.Point, margin int) BBox {
 	return BBox{left: left, right: right}
 }
 
-func (b BBox) Contains(p firefly.Point) bool {
+func (b BBox) contains(p firefly.Point) bool {
 	if p.X < b.left.X || p.X > b.right.X {
 		return false
 	}

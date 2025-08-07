@@ -8,14 +8,14 @@ import (
 
 const (
 	// How long (in frames) the snake can go without food.
-	HungerPeriod = 6 * 60
+	hungerPeriod = 6 * 60
 
 	// For how long (in frames) the snake is invulnerable after a collision.
-	IFrames = 60
+	iFrames = 60
 
-	BadgeBiteSelf     firefly.Badge = 1
-	BadgeBiteOther    firefly.Badge = 2
-	BadgeEat100Apples firefly.Badge = 3
+	badgeBiteSelf     firefly.Badge = 1
+	badgeBiteOther    firefly.Badge = 2
+	badgeEat100Apples firefly.Badge = 3
 )
 
 var score Score
@@ -34,57 +34,57 @@ type Score struct {
 	hunger int
 }
 
-func NewScore() Score {
+func newScore() Score {
 	return Score{
-		hunger:  HungerPeriod,
-		iframes: IFrames,
+		hunger:  hungerPeriod,
+		iframes: iFrames,
 	}
 }
 
-// Update the score.
+// update the score.
 //
 // Checks for collisions and iframes and decrements the score if needed.
-func (s *Score) Update(snake *Snake) {
+func (s *Score) update(snake *Snake) {
 	if s.iframes > 0 {
 		s.iframes -= 1
 	}
 	if s.hunger == 0 {
 		// Hungry. Decrese the score and start counting again.
-		s.Dec()
-		s.hunger = HungerPeriod
+		s.dec()
+		s.hunger = hungerPeriod
 	} else {
 		s.hunger -= 1
 	}
-	if snake.Collides(snake.Mouth) {
-		firefly.AddProgress(snake.Peer, BadgeBiteSelf, 1)
-		score.Dec()
+	if snake.collides(snake.mouth) {
+		firefly.AddProgress(snake.peer, badgeBiteSelf, 1)
+		score.dec()
 	}
 }
 
 // Increase the score.
 //
 // Triggered by [Snake] when eating an apple.
-func (s *Score) Inc() {
-	s.hunger = HungerPeriod
+func (s *Score) inc() {
+	s.hunger = hungerPeriod
 	s.val += 1
-	firefly.AddProgress(firefly.Combined, BadgeEat100Apples, 1)
+	firefly.AddProgress(firefly.Combined, badgeEat100Apples, 1)
 }
 
 // Decrease the score.
 //
 // Triggered by the score itself when the snake collides with itself.
-func (s *Score) Dec() {
+func (s *Score) dec() {
 	if s.iframes > 0 {
 		return
 	}
-	s.iframes = IFrames
+	s.iframes = iFrames
 	if s.val > 0 {
 		s.val -= (s.val/5 + 1)
 	}
 }
 
 // Show the score in the corner of the screen.
-func (s Score) Render() {
+func (s Score) render() {
 	firefly.DrawText(
 		strconv.Itoa(s.val), font,
 		firefly.Point{X: 10, Y: 10},
