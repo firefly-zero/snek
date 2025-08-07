@@ -1,5 +1,5 @@
 # https://taskfile.dev
-version: '3'
+version: "3"
 
 tasks:
   build:
@@ -17,4 +17,3 @@ tasks:
       - git push --tags
       - gh release create --generate-notes {{.CLI_ARGS}}
       - gh release upload {{.CLI_ARGS}} lux.snek.zip
-
