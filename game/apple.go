@@ -22,7 +22,16 @@ func newApple() Apple {
 
 // move the apple into a new place
 func (a *Apple) move() {
-	a.pos = firefly.Point{
+	pos := randomPoint()
+	// Don't place the apple inside the snake
+	for snakes.appleInside(pos) {
+		pos = randomPoint()
+	}
+	a.pos = pos
+}
+
+func randomPoint() firefly.Point {
+	return firefly.Point{
 		X: int(firefly.GetRandom()%(firefly.Width-appleRadius*2)) + appleRadius,
 		Y: int(firefly.GetRandom()%(firefly.Height-appleRadius*2)) + appleRadius,
 	}

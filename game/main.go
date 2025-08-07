@@ -4,35 +4,28 @@ import (
 	"github.com/firefly-zero/firefly-go/firefly"
 )
 
-var frame = 0
-var font firefly.Font
+var (
+	font   firefly.Font
+	frame  = 0
+	snakes *Snakes
+)
 
 func Boot() {
 	font = firefly.LoadFile("font", nil).Font()
+	snakes = newSnakes()
 	apple = newApple()
-	peers := firefly.GetPeers()
-	snakes = make([]*Snake, peers.Len())
-	for i, peer := range peers.Slice() {
-		snakes[i] = newSnake(peer)
-	}
 	score = newScore()
 }
 
 func Update() {
 	frame += 1
-	for _, snake := range snakes {
-		snake.update(frame, &apple)
-		snake.tryEat(&apple, &score)
-		score.update(snake)
-	}
+	snakes.update()
 }
 
 func Render() {
 	firefly.ClearScreen(firefly.ColorWhite)
 	apple.render()
-	for _, snake := range snakes {
-		snake.render(frame)
-	}
+	snakes.render()
 	score.render()
 }
 

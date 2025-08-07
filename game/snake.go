@@ -26,8 +26,6 @@ const (
 	growing State = 2
 )
 
-var snakes []*Snake
-
 type Segment struct {
 	head firefly.Point
 	tail *Segment
@@ -87,7 +85,7 @@ func newSnake(peer firefly.Peer) *Snake {
 }
 
 // update the position of all snake's segments.
-func (s *Snake) update(frame int, apple *Apple) {
+func (s *Snake) update(apple *Apple) {
 	frame = frame % period
 	pad, pressed := firefly.ReadPad(s.peer)
 	if pressed {
@@ -199,7 +197,7 @@ func (s *Snake) updateMouth(frame int) {
 //
 // If it can, start growing the snake and move the apple.
 func (s *Snake) tryEat(apple *Apple, score *Score) {
-	const minDist = (appleRadius + snakeWidth) / 2
+	const minDist = (appleRadius + snakeWidth + 2) / 2
 	const minDist2 = minDist * minDist
 	x := float32(apple.pos.X - s.mouth.X)
 	y := float32(apple.pos.Y - s.mouth.Y)
@@ -210,10 +208,6 @@ func (s *Snake) tryEat(apple *Apple, score *Score) {
 	s.state = eating
 	apple.move()
 	score.inc()
-	// Don't place the apple inside the snake
-	for s.collides(apple.pos) {
-		apple.move()
-	}
 }
 
 // Check if the given point is within the snake's body
@@ -236,7 +230,7 @@ func (s Snake) collides(p firefly.Point) bool {
 }
 
 // render all segments and the head of the snake
-func (s Snake) render(frame int) {
+func (s Snake) render() {
 	frame = frame % period
 	segment := s.head
 	for segment != nil {
