@@ -5,6 +5,7 @@ import "github.com/firefly-zero/firefly-go/firefly"
 type Segment struct {
 	head firefly.Point
 	tail *Segment
+	hurt bool
 }
 
 func (s *Segment) line() Line {
@@ -29,5 +30,9 @@ func (s *Segment) render(frame int, state State) {
 		end.X = start.X + (end.X-start.X)*(period-frame)/period
 		end.Y = start.Y + (end.Y-start.Y)*(period-frame)/period
 	}
-	drawSegment(start, end)
+	c := firefly.ColorBlue
+	if s.hurt {
+		c = firefly.ColorRed
+	}
+	drawSegment(start, end, c)
 }

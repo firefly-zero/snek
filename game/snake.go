@@ -214,15 +214,17 @@ func (s *Snake) appleCollides(p firefly.Point) bool {
 // Bites is detected based on if the first segment of this snake
 // intersects any of the segments of the other snake.
 func (s *Snake) bites(me bool, other *Snake) bool {
-	mouth := &Segment{head: s.mouth, tail: s.head}
-	myHead := mouth.line()
+	neck := &Segment{head: s.mouth, tail: s.head}
+	neckLine := neck.line()
 	segment := other.head.tail
 	if segment != nil && me {
 		segment = segment.tail
 	}
 	for segment != nil {
 		if segment.tail != nil {
-			if intersect(segment.line(), myHead) {
+			segment.hurt = false
+			if intersect(segment.line(), neckLine) {
+				segment.hurt = true
 				return true
 			}
 		}
@@ -248,7 +250,7 @@ func (s Snake) renderHead() {
 	mouth := s.mouth
 	neck.X, mouth.X = denormalizeX(neck.X, mouth.X)
 	neck.Y, mouth.Y = denormalizeY(neck.Y, mouth.Y)
-	drawSegment(neck, mouth)
+	drawSegment(neck, mouth, firefly.ColorBlue)
 	style := firefly.Solid(firefly.ColorWhite)
 	if s.hurt {
 		style.FillColor = firefly.ColorRed
@@ -306,27 +308,36 @@ func (s Snake) renderEye() {
 }
 
 // Render the segment and ghost segments if the snake wraps around the screen edges.
-func drawSegment(start, end firefly.Point) {
-	drawSegmentExactlyAt(start, end)
+func drawSegment(start, end firefly.Point, c firefly.Color) {
+	drawSegmentExactlyAt(start, end, c)
 	drawSegmentExactlyAt(
 		firefly.P(start.X-firefly.Width, start.Y),
 		firefly.P(end.X-firefly.Width, end.Y),
+		c,
 	)
 	drawSegmentExactlyAt(
 		firefly.P(start.X, start.Y-firefly.Height),
 		firefly.P(end.X, end.Y-firefly.Height),
+		c,
 	)
 	drawSegmentExactlyAt(
 		firefly.P(start.X-firefly.Width, start.Y-firefly.Height),
 		firefly.P(end.X-firefly.Width, end.Y-firefly.Height),
+		c,
 	)
 }
 
 // Render the segment.
-func drawSegmentExactlyAt(start, end firefly.Point) {
+func drawSegmentExactlyAt(start, end firefly.Point, c firefly.Color) {
+	if start.X < 0 && end.X < 0 {
+		return
+	}
+	if start.Y < 0 && end.Y < 0 {
+		return
+	}
 	firefly.DrawLine(
 		start, end,
-		firefly.L(firefly.ColorBlue, snakeWidth),
+		firefly.L(c, snakeWidth),
 	)
 	firefly.DrawCircle(
 		firefly.Point{
@@ -334,6 +345,6 @@ func drawSegmentExactlyAt(start, end firefly.Point) {
 			Y: end.Y - snakeWidth/2,
 		},
 		snakeWidth,
-		firefly.Solid(firefly.ColorBlue),
+		firefly.Solid(c),
 	)
 }
