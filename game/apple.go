@@ -41,7 +41,7 @@ func (a Apple) render() {
 	firefly.DrawCircle(
 		firefly.Point{X: a.pos.X - appleRadius, Y: a.pos.Y - appleRadius},
 		appleDiameter,
-		firefly.Style{FillColor: firefly.ColorRed},
+		firefly.Solid(firefly.ColorRed),
 	)
 	firefly.DrawLine(
 		a.pos,

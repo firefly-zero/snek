@@ -26,28 +26,6 @@ const (
 	growing State = 2
 )
 
-type Segment struct {
-	head firefly.Point
-	tail *Segment
-}
-
-// render the snake's segment
-func (s *Segment) render(frame int, state State) {
-	if s.tail == nil {
-		return
-	}
-	start := s.head
-	end := s.tail.head
-	start.X, end.X = denormalizeX(start.X, end.X)
-	start.Y, end.Y = denormalizeY(start.Y, end.Y)
-	// if this is the last segment (the snake's tail), draw it shorter.
-	if s.tail.tail == nil && state != growing {
-		end.X = start.X + (end.X-start.X)*(period-frame)/period
-		end.Y = start.Y + (end.Y-start.Y)*(period-frame)/period
-	}
-	drawSegment(start, end)
-}
-
 type Snake struct {
 	peer firefly.Peer
 
@@ -75,9 +53,9 @@ func newSnake(peer firefly.Peer) *Snake {
 	return &Snake{
 		peer: peer,
 		head: &Segment{
-			head: firefly.Point{X: segmentLen * 2, Y: shift},
+			head: firefly.P(segmentLen*2, shift),
 			tail: &Segment{
-				head: firefly.Point{X: segmentLen, Y: shift},
+				head: firefly.P(segmentLen, shift),
 				tail: nil,
 			},
 		},
@@ -124,10 +102,10 @@ func (s *Snake) setDir(pad firefly.Pad) {
 
 	// Ensure that the direction is always on the 0-360 degrees range.
 	if s.dir < 0 {
-		s.dir = s.dir + tinymath.Tau
+		s.dir += tinymath.Tau
 	}
 	if s.dir > tinymath.Tau {
-		s.dir = s.dir - tinymath.Tau
+		s.dir -= tinymath.Tau
 	}
 }
 
@@ -190,7 +168,7 @@ func (s *Snake) updateMouth(frame int) {
 	shiftY := tinymath.Sin(s.dir) * headLen
 	x := normalizeX(neck.X + int(shiftX))
 	y := normalizeY(neck.Y - int(shiftY))
-	s.mouth = firefly.Point{X: x, Y: y}
+	s.mouth = firefly.P(x, y)
 }
 
 // Check if the snake can eat the apple.
@@ -247,7 +225,7 @@ func (s Snake) renderHead() {
 	neck.X, mouth.X = denormalizeX(neck.X, mouth.X)
 	neck.Y, mouth.Y = denormalizeY(neck.Y, mouth.Y)
 	drawSegment(neck, mouth)
-	style := firefly.Style{FillColor: firefly.ColorWhite}
+	style := firefly.Solid(firefly.ColorWhite)
 	if s.collides(mouth) {
 		style.FillColor = firefly.ColorRed
 	}
@@ -257,14 +235,14 @@ func (s Snake) renderHead() {
 			X: mouth.X - snakeWidth/2 - 1,
 			Y: mouth.Y - snakeWidth/2 - 1,
 		},
-		snakeWidth+2, firefly.Style{FillColor: firefly.ColorBlue},
+		snakeWidth+2, firefly.Solid(firefly.ColorBlue),
 	)
 	firefly.DrawCircle(
 		firefly.Point{
 			X: mouth.X - snakeWidth/2,
 			Y: mouth.Y - snakeWidth/2,
 		},
-		snakeWidth, firefly.Style{FillColor: firefly.ColorLightBlue},
+		snakeWidth, firefly.Solid(firefly.ColorLightBlue),
 	)
 	firefly.DrawCircle(
 		firefly.Point{
@@ -280,20 +258,22 @@ func (s Snake) renderHead() {
 // Draw the snake's eye.
 func (s Snake) renderEye() {
 	firefly.DrawCircle(
-		firefly.Point{
-			X: s.eye.X - snakeWidth/8,
-			Y: s.eye.Y - snakeWidth/8,
-		},
-		snakeWidth/4, firefly.Style{FillColor: firefly.ColorBlack},
+		firefly.P(
+			s.eye.X-snakeWidth/8,
+			s.eye.Y-snakeWidth/8,
+		),
+		snakeWidth/4,
+		firefly.Solid(firefly.ColorBlack),
 	)
 
 	if s.blinkCounter < 20 {
 		firefly.DrawCircle(
-			firefly.Point{
-				X: s.mouth.X - snakeWidth/2 + 1,
-				Y: s.mouth.Y - snakeWidth/2 + 1,
-			},
-			snakeWidth-2, firefly.Style{FillColor: firefly.ColorLightBlue},
+			firefly.P(
+				s.mouth.X-snakeWidth/2+1,
+				s.mouth.Y-snakeWidth/2+1,
+			),
+			snakeWidth-2,
+			firefly.Solid(firefly.ColorLightBlue),
 		)
 	}
 }
@@ -302,16 +282,16 @@ func (s Snake) renderEye() {
 func drawSegment(start, end firefly.Point) {
 	drawSegmentExactlyAt(start, end)
 	drawSegmentExactlyAt(
-		firefly.Point{X: start.X - firefly.Width, Y: start.Y},
-		firefly.Point{X: end.X - firefly.Width, Y: end.Y},
+		firefly.P(start.X-firefly.Width, start.Y),
+		firefly.P(end.X-firefly.Width, end.Y),
 	)
 	drawSegmentExactlyAt(
-		firefly.Point{X: start.X, Y: start.Y - firefly.Height},
-		firefly.Point{X: end.X, Y: end.Y - firefly.Height},
+		firefly.P(start.X, start.Y-firefly.Height),
+		firefly.P(end.X, end.Y-firefly.Height),
 	)
 	drawSegmentExactlyAt(
-		firefly.Point{X: start.X - firefly.Width, Y: start.Y - firefly.Height},
-		firefly.Point{X: end.X - firefly.Width, Y: end.Y - firefly.Height},
+		firefly.P(start.X-firefly.Width, start.Y-firefly.Height),
+		firefly.P(end.X-firefly.Width, end.Y-firefly.Height),
 	)
 }
 
@@ -319,10 +299,7 @@ func drawSegment(start, end firefly.Point) {
 func drawSegmentExactlyAt(start, end firefly.Point) {
 	firefly.DrawLine(
 		start, end,
-		firefly.LineStyle{
-			Color: firefly.ColorBlue,
-			Width: snakeWidth,
-		},
+		firefly.L(firefly.ColorBlue, snakeWidth),
 	)
 	firefly.DrawCircle(
 		firefly.Point{
@@ -330,9 +307,7 @@ func drawSegmentExactlyAt(start, end firefly.Point) {
 			Y: end.Y - snakeWidth/2,
 		},
 		snakeWidth,
-		firefly.Style{
-			FillColor: firefly.ColorBlue,
-		},
+		firefly.Solid(firefly.ColorBlue),
 	)
 }
 
