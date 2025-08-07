@@ -30,11 +30,11 @@ func (a *Apple) move() {
 	a.pos = pos
 }
 
+// Pick a random point for a new apple so that it's fully within the screen.
 func randomPoint() firefly.Point {
-	return firefly.Point{
-		X: int(firefly.GetRandom()%(firefly.Width-appleRadius*2)) + appleRadius,
-		Y: int(firefly.GetRandom()%(firefly.Height-appleRadius*2)) + appleRadius,
-	}
+	x := int(firefly.GetRandom()%(firefly.Width-appleRadius*2)) + appleRadius
+	y := int(firefly.GetRandom()%(firefly.Height-appleRadius*2)) + appleRadius
+	return firefly.P(x, y)
 }
 
 func (a Apple) render() {
