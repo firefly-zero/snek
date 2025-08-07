@@ -21,8 +21,22 @@ func (ss *Snakes) update() {
 	for _, snake := range ss.items {
 		snake.update(&apple)
 		snake.tryEat(&apple, &score)
-		score.update(snake)
+		snake.hurt = false
 	}
+
+	for i, s1 := range snakes.items {
+		for j, s2 := range snakes.items {
+			me := i == j
+			if s1.bites(me, s2) {
+				if me {
+					firefly.AddProgress(s1.peer, badgeBiteSelf, 1)
+				}
+				s1.hurt = true
+				score.dec()
+			}
+		}
+	}
+
 }
 
 func (ss *Snakes) render() {
@@ -42,7 +56,7 @@ func (ss *Snakes) appleInside(pos firefly.Point) bool {
 		return false
 	}
 	for _, s := range ss.items {
-		if s.collides(pos) {
+		if s.appleCollides(pos) {
 			return true
 		}
 	}

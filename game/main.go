@@ -20,6 +20,7 @@ func Boot() {
 func Update() {
 	frame += 1
 	snakes.update()
+	score.update()
 }
 
 func Render() {

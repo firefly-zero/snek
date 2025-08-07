@@ -7,6 +7,14 @@ type Segment struct {
 	tail *Segment
 }
 
+func (s *Segment) line() Line {
+	ph := s.head
+	pt := s.tail.head
+	ph.X, pt.X = denormalizeX(ph.X, pt.X)
+	ph.Y, pt.Y = denormalizeY(ph.Y, pt.Y)
+	return Line{ph, pt}
+}
+
 // render the snake's segment
 func (s *Segment) render(frame int, state State) {
 	if s.tail == nil {

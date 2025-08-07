@@ -46,6 +46,8 @@ type Snake struct {
 
 	// Indicates if the snake is growing.
 	state State
+
+	hurt bool
 }
 
 func newSnake(peer firefly.Peer) *Snake {
@@ -188,8 +190,8 @@ func (s *Snake) tryEat(apple *Apple, score *Score) {
 	score.inc()
 }
 
-// Check if the given point is within the snake's body
-func (s Snake) collides(p firefly.Point) bool {
+// Check if the given apple position is within the snake's body.
+func (s *Snake) appleCollides(p firefly.Point) bool {
 	segment := s.head.tail
 	for segment != nil {
 		if segment.tail != nil {
@@ -207,8 +209,30 @@ func (s Snake) collides(p firefly.Point) bool {
 	return false
 }
 
+// Check if this snake bites the given snake.
+//
+// Bites is detected based on if the first segment of this snake
+// intersects any of the segments of the other snake.
+func (s *Snake) bites(me bool, other *Snake) bool {
+	mouth := &Segment{head: s.mouth, tail: s.head}
+	myHead := mouth.line()
+	segment := other.head.tail
+	if segment != nil && me {
+		segment = segment.tail
+	}
+	for segment != nil {
+		if segment.tail != nil {
+			if intersect(segment.line(), myHead) {
+				return true
+			}
+		}
+		segment = segment.tail
+	}
+	return false
+}
+
 // render all segments and the head of the snake
-func (s Snake) render() {
+func (s *Snake) render() {
 	frame = frame % period
 	segment := s.head
 	for segment != nil {
@@ -226,7 +250,7 @@ func (s Snake) renderHead() {
 	neck.Y, mouth.Y = denormalizeY(neck.Y, mouth.Y)
 	drawSegment(neck, mouth)
 	style := firefly.Solid(firefly.ColorWhite)
-	if s.collides(mouth) {
+	if s.hurt {
 		style.FillColor = firefly.ColorRed
 	}
 
@@ -235,21 +259,24 @@ func (s Snake) renderHead() {
 			X: mouth.X - snakeWidth/2 - 1,
 			Y: mouth.Y - snakeWidth/2 - 1,
 		},
-		snakeWidth+2, firefly.Solid(firefly.ColorBlue),
+		snakeWidth+2,
+		firefly.Solid(firefly.ColorBlue),
 	)
 	firefly.DrawCircle(
 		firefly.Point{
 			X: mouth.X - snakeWidth/2,
 			Y: mouth.Y - snakeWidth/2,
 		},
-		snakeWidth, firefly.Solid(firefly.ColorLightBlue),
+		snakeWidth,
+		firefly.Solid(firefly.ColorLightBlue),
 	)
 	firefly.DrawCircle(
 		firefly.Point{
 			X: s.mouth.X - snakeWidth/2 + 1,
 			Y: s.mouth.Y - snakeWidth/2 + 1,
 		},
-		snakeWidth-2, style,
+		snakeWidth-2,
+		style,
 	)
 
 	s.renderEye()
@@ -309,46 +336,4 @@ func drawSegmentExactlyAt(start, end firefly.Point) {
 		snakeWidth,
 		firefly.Solid(firefly.ColorBlue),
 	)
-}
-
-// If x points outside the screen, shift it so that it's back on the screen.
-func normalizeX(x int) int {
-	if x >= firefly.Width {
-		x -= firefly.Width
-	} else if x < 0 {
-		x += firefly.Width
-	}
-	return x
-}
-
-// If y points outside the screen, shift it so that it's back on the screen.
-func normalizeY(y int) int {
-	if y >= firefly.Height {
-		y = y - firefly.Height
-	} else if y < 0 {
-		y += firefly.Height
-	}
-	return y
-}
-
-// If the dots are on the opposite sides of the screen,
-// put the left one on the right outside the screen.
-func denormalizeX(start, end int) (int, int) {
-	if start-end > 30 {
-		end += firefly.Width
-	} else if end-start > 30 {
-		start += firefly.Width
-	}
-	return start, end
-}
-
-// If the dots are on the opposite sides of the screen,
-// put the upper one on the bottom outside the screen.
-func denormalizeY(start, end int) (int, int) {
-	if start-end > 30 {
-		end += firefly.Height
-	} else if end-start > 30 {
-		start += firefly.Height
-	}
-	return start, end
 }

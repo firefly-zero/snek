@@ -44,20 +44,16 @@ func newScore() Score {
 // update the score.
 //
 // Checks for collisions and iframes and decrements the score if needed.
-func (s *Score) update(snake *Snake) {
+func (s *Score) update() {
 	if s.iframes > 0 {
 		s.iframes -= 1
 	}
 	if s.hunger == 0 {
 		// Hungry. Decrese the score and start counting again.
-		s.dec()
+		// s.dec()
 		s.hunger = hungerPeriod
 	} else {
 		s.hunger -= 1
-	}
-	if snake.collides(snake.mouth) {
-		firefly.AddProgress(snake.peer, badgeBiteSelf, 1)
-		score.dec()
 	}
 }
 
