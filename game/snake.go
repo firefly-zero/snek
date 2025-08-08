@@ -263,7 +263,7 @@ func (s *Snake) render() {
 	s.renderHead()
 	if s.youTTL != 0 {
 		s.renderYou()
-	} else {
+	} else if s.score.ttl != 0 {
 		s.renderScore()
 	}
 }
