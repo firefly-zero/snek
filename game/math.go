@@ -1,6 +1,10 @@
 package game
 
-import "github.com/firefly-zero/firefly-go/firefly"
+import (
+	"unsafe"
+
+	"github.com/firefly-zero/firefly-go/firefly"
+)
 
 type Line struct {
 	h firefly.Point
@@ -59,4 +63,9 @@ func denormalizeY(start, end int) (int, int) {
 		start += firefly.Height
 	}
 	return start, end
+}
+
+func formatInt(i int) string {
+	buf := []byte{'0' + byte(i/10), '0' + byte(i%10)}
+	return unsafe.String(&buf[0], 2)
 }

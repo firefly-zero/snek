@@ -1,8 +1,6 @@
 package game
 
 import (
-	"strconv"
-
 	"github.com/firefly-zero/firefly-go/firefly"
 	"github.com/orsinium-labs/tinymath"
 )
@@ -341,8 +339,8 @@ func (s *Snake) renderYou() {
 }
 
 func (s *Snake) renderScore() {
-	firefly.DrawText(
-		strconv.Itoa(s.score.val), font,
+	font.Draw(
+		formatInt(s.score.val),
 		firefly.P(s.mouth.X-5, s.mouth.Y-6),
 		firefly.ColorDarkBlue,
 	)
