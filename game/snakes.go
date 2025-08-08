@@ -20,7 +20,7 @@ func (ss *Snakes) update() {
 	}
 	for _, snake := range ss.items {
 		snake.update(&apple)
-		snake.tryEat(&apple, &score)
+		snake.tryEat(&apple)
 	}
 
 	for i, s1 := range snakes.items {
@@ -31,7 +31,7 @@ func (ss *Snakes) update() {
 					firefly.AddProgress(s1.peer, badgeBiteSelf, 1)
 				}
 				s1.hurt = true
-				score.dec()
+				s1.score.dec()
 			}
 		}
 	}

@@ -1,8 +1,6 @@
 package game
 
 import (
-	"strconv"
-
 	"github.com/firefly-zero/firefly-go/firefly"
 )
 
@@ -18,8 +16,6 @@ const (
 	badgeEat100Apples firefly.Badge = 3
 )
 
-var score Score
-
 type Score struct {
 	// The current score.
 	// Cannot go below zero.
@@ -34,8 +30,8 @@ type Score struct {
 	hunger int
 }
 
-func newScore() Score {
-	return Score{
+func newScore() *Score {
+	return &Score{
 		hunger:  hungerPeriod,
 		iframes: iFrames,
 	}
@@ -77,13 +73,4 @@ func (s *Score) dec() {
 	if s.val > 0 {
 		s.val -= (s.val/5 + 1)
 	}
-}
-
-// Show the score in the corner of the screen.
-func (s Score) render() {
-	firefly.DrawText(
-		strconv.Itoa(s.val), font,
-		firefly.Point{X: 10, Y: 10},
-		firefly.ColorDarkBlue,
-	)
 }

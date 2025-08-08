@@ -1,6 +1,8 @@
 package game
 
 import (
+	"strconv"
+
 	"github.com/firefly-zero/firefly-go/firefly"
 	"github.com/orsinium-labs/tinymath"
 )
@@ -28,6 +30,8 @@ const (
 
 type Snake struct {
 	peer firefly.Peer
+
+	score *Score
 
 	// The start point of the first full-length segment (the neck).
 	head *Segment
@@ -63,6 +67,7 @@ func newSnake(peer firefly.Peer) *Snake {
 	}
 	return &Snake{
 		peer:   peer,
+		score:  newScore(),
 		youTTL: youTTL,
 		head: &Segment{
 			head: firefly.P(segmentLen*2, shift),
@@ -89,6 +94,7 @@ func (s *Snake) update(apple *Apple) {
 	}
 	s.updateMouth(frame)
 	s.updateEye(apple.pos)
+	s.score.update()
 }
 
 // Set Dir value based on the pad input.
@@ -189,7 +195,7 @@ func (s *Snake) updateMouth(frame int) {
 // Check if the snake can eat the apple.
 //
 // If it can, start growing the snake and move the apple.
-func (s *Snake) tryEat(apple *Apple, score *Score) {
+func (s *Snake) tryEat(apple *Apple) {
 	const minDist = (appleRadius + snakeWidth + 2) / 2
 	const minDist2 = minDist * minDist
 	x := float32(apple.pos.X - s.mouth.X)
@@ -200,7 +206,7 @@ func (s *Snake) tryEat(apple *Apple, score *Score) {
 	}
 	s.state = eating
 	apple.move()
-	score.inc()
+	s.score.inc()
 }
 
 // Check if the given apple position is within the snake's body.
@@ -257,6 +263,8 @@ func (s *Snake) render() {
 	s.renderHead()
 	if s.youTTL != 0 {
 		s.renderYou()
+	} else {
+		s.renderScore()
 	}
 }
 
@@ -330,6 +338,14 @@ func (s Snake) renderEye() {
 func (s *Snake) renderYou() {
 	p := firefly.P(s.mouth.X-5, s.mouth.Y-6)
 	font.Draw("you", p, firefly.ColorRed)
+}
+
+func (s *Snake) renderScore() {
+	firefly.DrawText(
+		strconv.Itoa(s.score.val), font,
+		firefly.P(s.mouth.X-5, s.mouth.Y-6),
+		firefly.ColorDarkBlue,
+	)
 }
 
 // Render the segment and ghost segments if the snake wraps around the screen edges.

@@ -16,20 +16,17 @@ func Boot() {
 	me = firefly.GetMe()
 	snakes = newSnakes()
 	apple = newApple()
-	score = newScore()
 }
 
 func Update() {
 	frame += 1
 	snakes.update()
-	score.update()
 }
 
 func Render() {
 	firefly.ClearScreen(firefly.ColorWhite)
 	apple.render()
 	snakes.render()
-	score.render()
 }
 
 func Cheat(c, v int) int {
@@ -38,16 +35,27 @@ func Cheat(c, v int) int {
 		apple.move()
 		return 1
 	case 2:
+		s := getMySnake()
 		for i := 0; i < int(v); i++ {
-			score.inc()
+			s.score.inc()
 		}
-		return score.val
+		return s.score.val
 	case 3:
+		s := getMySnake()
 		for i := 0; i < int(v); i++ {
-			score.dec()
+			s.score.dec()
 		}
-		return score.val
+		return s.score.val
 	default:
 		return 0
 	}
+}
+
+func getMySnake() *Snake {
+	for _, s := range snakes.items {
+		if s.peer == me {
+			return s
+		}
+	}
+	return snakes.items[0]
 }
