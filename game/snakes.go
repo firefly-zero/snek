@@ -21,7 +21,6 @@ func (ss *Snakes) update() {
 	for _, snake := range ss.items {
 		snake.update(&apple)
 		snake.tryEat(&apple, &score)
-		snake.hurt = false
 	}
 
 	for i, s1 := range snakes.items {

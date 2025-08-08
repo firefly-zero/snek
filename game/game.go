@@ -8,10 +8,12 @@ var (
 	font   firefly.Font
 	frame  = 0
 	snakes *Snakes
+	me     firefly.Peer
 )
 
 func Boot() {
 	font = firefly.LoadFile("font", nil).Font()
+	me = firefly.GetMe()
 	snakes = newSnakes()
 	apple = newApple()
 	score = newScore()

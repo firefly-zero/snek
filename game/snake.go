@@ -47,13 +47,23 @@ type Snake struct {
 	// Indicates if the snake is growing.
 	state State
 
+	// If true, the snake has bumped into another snake or itself on this update.
+	// Used to highlight the snake's eye with red.
 	hurt bool
+
+	// While not zero, an "you" message will be shown above the snake's head.
+	youTTL uint8
 }
 
 func newSnake(peer firefly.Peer) *Snake {
 	shift := 10 + snakeWidth + int(peer)*20
+	var youTTL uint8
+	if peer == me {
+		youTTL = 180
+	}
 	return &Snake{
-		peer: peer,
+		peer:   peer,
+		youTTL: youTTL,
 		head: &Segment{
 			head: firefly.P(segmentLen*2, shift),
 			tail: &Segment{
@@ -67,6 +77,9 @@ func newSnake(peer firefly.Peer) *Snake {
 // update the position of all snake's segments.
 func (s *Snake) update(apple *Apple) {
 	frame = frame % period
+	if s.youTTL > 0 {
+		s.youTTL--
+	}
 	pad, pressed := firefly.ReadPad(s.peer)
 	if pressed {
 		s.setDir(pad)
@@ -242,10 +255,13 @@ func (s *Snake) render() {
 		segment = segment.tail
 	}
 	s.renderHead()
+	if s.youTTL != 0 {
+		s.renderYou()
+	}
 }
 
 // Draw the zero segment of the snake: it's head.
-func (s Snake) renderHead() {
+func (s *Snake) renderHead() {
 	neck := s.head.head
 	mouth := s.mouth
 	neck.X, mouth.X = denormalizeX(neck.X, mouth.X)
@@ -255,6 +271,9 @@ func (s Snake) renderHead() {
 	if s.hurt {
 		style.FillColor = firefly.ColorRed
 	}
+	// We reset it only after rendering to make sure to render it
+	// for at least one frame.
+	s.hurt = false
 
 	firefly.DrawCircle(
 		firefly.Point{
@@ -305,6 +324,12 @@ func (s Snake) renderEye() {
 			firefly.Solid(firefly.ColorLightBlue),
 		)
 	}
+}
+
+// Render a "you" message above the snake's head.
+func (s *Snake) renderYou() {
+	p := firefly.P(s.mouth.X-5, s.mouth.Y-6)
+	font.Draw("you", p, firefly.ColorRed)
 }
 
 // Render the segment and ghost segments if the snake wraps around the screen edges.
