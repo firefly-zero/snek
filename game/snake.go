@@ -39,6 +39,7 @@ type Snake struct {
 
 	// The point the snake is looking at.
 	eye firefly.Point
+
 	// The timer for the snake's eye blinking.
 	blinkCounter int
 	blinkMaxTime int
@@ -342,7 +343,7 @@ func (s *Snake) renderScore() {
 	font.Draw(
 		formatInt(s.score.val),
 		firefly.P(s.mouth.X-5, s.mouth.Y-6),
-		firefly.ColorDarkBlue,
+		s.score.color,
 	)
 }
 

@@ -23,13 +23,15 @@ type Score struct {
 
 	// Invisibility frames.
 	// For how many frames from now the snake is invinsible.
-	iframes int
+	iframes uint8
 
 	// How many more frames the snake can last without food.
 	// If reaches zero, the scroe decrements by one step.
-	hunger int
+	hunger uint16
 
 	ttl uint8
+
+	color firefly.Color
 }
 
 func newScore() *Score {
@@ -48,8 +50,10 @@ func (s *Score) update() {
 	}
 	if s.hunger == 0 {
 		// Hungry. Decrese the score and start counting again.
-		s.dec()
-		s.hunger = hungerPeriod
+		if s.val != 0 {
+			s.dec()
+			s.hunger = hungerPeriod
+		}
 	} else {
 		s.hunger--
 	}
@@ -65,6 +69,7 @@ func (s *Score) inc() {
 	s.hunger = hungerPeriod
 	s.val += 1
 	firefly.AddProgress(firefly.Combined, badgeEat100Apples, 1)
+	s.color = firefly.ColorDarkGreen
 	s.ttl = 60
 }
 
@@ -79,5 +84,6 @@ func (s *Score) dec() {
 	if s.val > 0 {
 		s.val -= (s.val/5 + 1)
 	}
+	s.color = firefly.ColorRed
 	s.ttl = 60
 }
