@@ -240,7 +240,8 @@ func (s *Snake) render() {
 	s.eye.render(s.mouth)
 	if s.youTTL != 0 {
 		s.renderYou()
-	} else if s.score.ttl != 0 {
+	}
+	if s.score.ttl != 0 {
 		s.renderScore()
 	}
 }
@@ -288,7 +289,7 @@ func (s *Snake) renderYou() {
 func (s *Snake) renderScore() {
 	font.Draw(
 		formatInt(s.score.val),
-		firefly.P(s.mouth.X-5, s.mouth.Y-6),
+		firefly.P(s.mouth.X-3, s.mouth.Y+snakeWidth+3),
 		s.score.color,
 	)
 }
