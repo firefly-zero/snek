@@ -53,6 +53,9 @@ func (s *Score) update() {
 		if s.val != 0 {
 			s.dec()
 			s.hunger = hungerPeriod
+			if s.val == 0 {
+				setTitle("ur snek ded cuz its hungie :(")
+			}
 		}
 	} else {
 		s.hunger--

@@ -6,25 +6,40 @@ import (
 
 var (
 	font   firefly.Font
-	frame  = 0
+	frame  int
 	snakes *Snakes
+	title  *Title
 	me     firefly.Peer
 )
 
 func Boot() {
 	font = firefly.LoadFile("font", nil).Font()
 	me = firefly.GetMe()
+	resetGame()
+}
+
+func resetGame() {
 	snakes = newSnakes()
 	apple = newApple()
+	frame = 0
+	title = nil
 }
 
 func Update() {
+	if title != nil {
+		title.update()
+		return
+	}
 	frame += 1
 	snakes.update()
 }
 
 func Render() {
 	firefly.ClearScreen(firefly.ColorWhite)
+	if title != nil {
+		title.render()
+		return
+	}
 	apple.render()
 	snakes.render()
 }
