@@ -47,6 +47,9 @@ type Snake struct {
 
 	// While not zero, an "you" message will be shown above the snake's head.
 	youTTL uint8
+
+	// If true, render a crown on the snake's head.
+	crown bool
 }
 
 func newSnake(peer firefly.Peer) *Snake {
@@ -231,6 +234,9 @@ func (s *Snake) render() {
 		segment = segment.tail
 	}
 	s.renderNeck()
+	if s.crown {
+		s.renderCrown()
+	}
 	s.eye.render(s.mouth)
 	if s.youTTL != 0 {
 		s.renderYou()
@@ -246,6 +252,31 @@ func (s *Snake) renderNeck() {
 	neck.X, mouth.X = denormalizeX(neck.X, mouth.X)
 	neck.Y, mouth.Y = denormalizeY(neck.Y, mouth.Y)
 	drawSegment(neck, mouth, firefly.ColorBlue)
+}
+
+func (s *Snake) renderCrown() {
+	mouth := s.mouth
+	left := mouth.Add(firefly.P(-snakeWidth/2, -snakeWidth/2))
+	right := mouth.Add(firefly.P(snakeWidth/2, -snakeWidth/2))
+	topY := mouth.Y - 8
+	// left spike
+	firefly.DrawTriangle(
+		left, right,
+		firefly.P(left.X-1, topY+1),
+		firefly.Solid(firefly.ColorYellow),
+	)
+	// right spike
+	firefly.DrawTriangle(
+		left, right,
+		firefly.P(right.X+1, topY+1),
+		firefly.Solid(firefly.ColorYellow),
+	)
+	// middle spike
+	firefly.DrawTriangle(
+		left, right,
+		firefly.P(left.X+snakeWidth/2, topY),
+		firefly.Solid(firefly.ColorYellow),
+	)
 }
 
 // Render a "you" message above the snake's head.

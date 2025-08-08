@@ -18,9 +18,24 @@ func (ss *Snakes) update() {
 	if ss == nil {
 		return
 	}
+	var best *Snake
+	bestScore := 0
 	for _, snake := range ss.items {
+		snake.crown = false
 		snake.update()
 		snake.tryEat()
+		score := snake.score.val
+		if score == bestScore {
+			// Nobody's the best if there is a tie.
+			best = nil
+		} else if score > bestScore {
+			best = snake
+			bestScore = score
+		}
+	}
+	// In multiplayer, render a crown on the best snake.
+	if len(ss.items) > 1 && best != nil {
+		best.crown = true
 	}
 
 	for i, s1 := range snakes.items {
