@@ -18,7 +18,7 @@ type Eye struct {
 	blinkMaxTime int
 }
 
-func (s *Eye) update(mouth firefly.Point) {
+func (eye *Eye) update(mouth firefly.Point) {
 	// Calculate position of eye based on the where the apple is
 	lookX := float32(apple.pos.X - mouth.X)
 	lookY := float32(apple.pos.Y - mouth.Y)
@@ -26,26 +26,26 @@ func (s *Eye) update(mouth firefly.Point) {
 	dX := lookX * 3 / lookLen
 	dY := lookY * 3 / lookLen
 
-	s.lookingAt = firefly.Point{
+	eye.lookingAt = firefly.Point{
 		X: mouth.X + int(dX),
 		Y: mouth.Y + int(dY),
 	}
 
-	s.blinkCounter += int(firefly.GetRandom() % 5)
-	if s.blinkCounter > s.blinkMaxTime {
-		s.blinkCounter = 0
-		s.blinkMaxTime = int(100 + firefly.GetRandom()%100)
+	eye.blinkCounter += int(firefly.GetRandom() % 5)
+	if eye.blinkCounter > eye.blinkMaxTime {
+		eye.blinkCounter = 0
+		eye.blinkMaxTime = int(100 + firefly.GetRandom()%100)
 	}
 }
 
-func (s *Eye) render(mouth firefly.Point) {
+func (eye *Eye) render(mouth firefly.Point) {
 	style := firefly.Solid(firefly.ColorWhite)
-	if s.hurt {
+	if eye.hurt {
 		style.FillColor = firefly.ColorRed
 	}
 	// We reset it only after rendering to make sure to render it
 	// for at least one frame.
-	s.hurt = false
+	eye.hurt = false
 
 	// Outer dark circle representing the head.
 	firefly.DrawCircle(
@@ -80,15 +80,15 @@ func (s *Eye) render(mouth firefly.Point) {
 	// Black circle representing the eye iris.
 	firefly.DrawCircle(
 		firefly.P(
-			s.lookingAt.X-snakeWidth/8,
-			s.lookingAt.Y-snakeWidth/8,
+			eye.lookingAt.X-snakeWidth/8,
+			eye.lookingAt.Y-snakeWidth/8,
 		),
 		snakeWidth/4,
 		firefly.Solid(firefly.ColorBlack),
 	)
 
 	// If it's soon time to blink, close the eyelid.
-	if s.blinkCounter < 20 {
+	if eye.blinkCounter < 20 {
 		firefly.DrawCircle(
 			firefly.P(
 				mouth.X-snakeWidth/2+1,
