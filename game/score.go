@@ -17,8 +17,9 @@ const (
 )
 
 type Score struct {
-	// The current score.
-	// Cannot go below zero.
+	peer firefly.Peer
+
+	// The current score. Cannot go below zero.
 	val int
 
 	// Invisibility frames.
@@ -34,8 +35,9 @@ type Score struct {
 	color firefly.Color
 }
 
-func newScore() *Score {
+func newScore(peer firefly.Peer) *Score {
 	return &Score{
+		peer:    peer,
 		hunger:  hungerPeriod,
 		iframes: iFrames,
 	}
@@ -54,7 +56,11 @@ func (s *Score) update() {
 			s.dec()
 			s.hunger = hungerPeriod
 			if s.val == 0 {
-				setTitle("ur snek ded cuz its hungie :(")
+				if s.peer == me {
+					setTitle("ur snek ded cuz its hungie :(")
+				} else {
+					setTitle("aze snek ded cuz its hungie, u win")
+				}
 			}
 		}
 	} else {

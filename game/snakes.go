@@ -19,8 +19,8 @@ func (ss *Snakes) update() {
 		return
 	}
 	for _, snake := range ss.items {
-		snake.update(&apple)
-		snake.tryEat(&apple)
+		snake.update()
+		snake.tryEat()
 	}
 
 	for i, s1 := range snakes.items {
