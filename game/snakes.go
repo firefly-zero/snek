@@ -30,7 +30,7 @@ func (ss *Snakes) update() {
 				if me {
 					firefly.AddProgress(s1.peer, badgeBiteSelf, 1)
 				}
-				s1.hurt = true
+				s1.eye.hurt = true
 				s1.score.dec()
 			}
 		}
