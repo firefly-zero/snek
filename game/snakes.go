@@ -25,13 +25,28 @@ func (ss *Snakes) update() {
 
 	for i, s1 := range snakes.items {
 		for j, s2 := range snakes.items {
-			me := i == j
-			if s1.bites(me, s2) {
-				if me {
+			sameSnek := i == j
+			if s1.bites(sameSnek, s2) {
+				if sameSnek {
 					firefly.AddProgress(s1.peer, badgeBiteSelf, 1)
 				}
 				s1.eye.hurt = true
 				s1.score.dec()
+				if s1.score.val == 0 {
+					if sameSnek {
+						if s1.peer == me {
+							setTitle("u bit urself :(")
+						} else {
+							setTitle("other snek bit itself, u win")
+						}
+					} else {
+						if s1.peer == me {
+							setTitle("u lose :(")
+						} else {
+							setTitle("u win")
+						}
+					}
+				}
 			}
 		}
 	}
