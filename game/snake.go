@@ -59,7 +59,7 @@ func newSnake(peer firefly.Peer) *Snake {
 		peer:   peer,
 		score:  newScore(peer),
 		youTTL: youTTL,
-		eye:    Eye{},
+		eye:    Eye{peer: peer},
 		head: &Segment{
 			head: firefly.P(segmentLen*2, shift),
 			tail: &Segment{
@@ -166,7 +166,7 @@ func (s *Snake) updateMouth(frame int) {
 //
 // If it can, start growing the snake and move the apple.
 func (s *Snake) tryEat() {
-	const minDist = (appleRadius + snakeWidth + 2) / 2
+	const minDist = (appleRadius+snakeWidth)/2 + 3
 	const minDist2 = minDist * minDist
 	x := float32(apple.pos.X - s.mouth.X)
 	y := float32(apple.pos.Y - s.mouth.Y)
