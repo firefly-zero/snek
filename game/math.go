@@ -65,7 +65,7 @@ func denormalizeY(start, end int) (int, int) {
 	return start, end
 }
 
-func formatInt(i int) string {
+func formatInt(i int16) string {
 	buf := []byte{'0' + byte(i/10), '0' + byte(i%10)}
 	return unsafe.String(&buf[0], 2)
 }

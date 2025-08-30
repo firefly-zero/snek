@@ -16,3 +16,7 @@ dec-score = 3  # Decrement the score by the given value
 1 = { name = "m i tasti", descr = "bite yourself" }
 2 = { name = "u r tasti", descr = "bite someone else" }
 3 = { name = "apel tasti", descr = "eat 100 apples", steps = 100 }
+
+[boards]
+1 = { name = "singleplayer" }
+2 = { name = "multiplayer" }

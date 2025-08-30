@@ -54,13 +54,13 @@ func Cheat(c, v int) int {
 		for i := 0; i < int(v); i++ {
 			s.score.inc()
 		}
-		return s.score.val
+		return int(s.score.val)
 	case 3:
 		s := getMySnake()
 		for i := 0; i < int(v); i++ {
 			s.score.dec()
 		}
-		return s.score.val
+		return int(s.score.val)
 	default:
 		return 0
 	}

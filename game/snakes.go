@@ -19,7 +19,7 @@ func (ss *Snakes) update() {
 		return
 	}
 	var best *Snake
-	bestScore := 0
+	var bestScore int16 = 0
 	for _, snake := range ss.items {
 		snake.crown = false
 		snake.update()
@@ -44,6 +44,8 @@ func (ss *Snakes) update() {
 			if s1.bites(sameSnek, s2) {
 				if sameSnek {
 					firefly.AddProgress(s1.peer, badgeBiteSelf, 1)
+				} else {
+					firefly.AddProgress(s1.peer, badgeBiteOther, 1)
 				}
 				s1.eye.hurt = true
 				s1.score.dec()

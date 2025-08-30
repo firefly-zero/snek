@@ -20,7 +20,7 @@ type Score struct {
 	peer firefly.Peer
 
 	// The current score. Cannot go below zero.
-	val int
+	val int16
 
 	// Invisibility frames.
 	// For how many frames from now the snake is invinsible.
