@@ -13,7 +13,7 @@ firefly_cli import lux.snek
 Build and install from source:
 
 ```bash
-git clone https://codeberg.org/firefly-zero/snek.git
+git clone https://github.com/firefly-zero/snek.git
 cd snek
 firefly_cli build
 ```
