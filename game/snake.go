@@ -52,10 +52,10 @@ type Snake struct {
 	crown bool
 }
 
-func newSnake(peer firefly.Peer) *Snake {
+func newSnake(peer firefly.Peer, isMultiplayer bool) *Snake {
 	shift := 10 + snakeWidth + int(peer)*20
 	var youTTL uint8
-	if peer == me {
+	if peer == me && isMultiplayer {
 		youTTL = 180
 	}
 	return &Snake{

@@ -7,10 +7,11 @@ type Snakes struct {
 }
 
 func newSnakes() *Snakes {
-	peers := firefly.GetPeers()
-	snakes := make([]*Snake, peers.Len())
-	for i, peer := range peers.Slice() {
-		snakes[i] = newSnake(peer)
+	peers := firefly.GetPeers().Slice()
+	isMultiplayer := len(peers) != 1
+	snakes := make([]*Snake, len(peers))
+	for i, peer := range peers {
+		snakes[i] = newSnake(peer, isMultiplayer)
 	}
 	return &Snakes{snakes}
 }
