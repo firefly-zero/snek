@@ -6,8 +6,6 @@ import (
 )
 
 type Eye struct {
-	peer firefly.Peer
-
 	// The point the snake is looking at.
 	lookingAt firefly.Point
 
@@ -40,7 +38,7 @@ func (eye *Eye) update(mouth firefly.Point) {
 	}
 }
 
-func (eye *Eye) render(mouth firefly.Point) {
+func (eye *Eye) render(mouth firefly.Point, me bool) {
 	style := firefly.Solid(firefly.ColorWhite)
 	if eye.hurt {
 		style.FillColor = firefly.ColorRed
@@ -50,19 +48,23 @@ func (eye *Eye) render(mouth firefly.Point) {
 	eye.hurt = false
 
 	// Outer dark circle representing the head.
+	headColor := firefly.ColorBlue
+	if !me {
+		headColor = firefly.ColorGray
+	}
 	firefly.DrawCircle(
 		firefly.Point{
 			X: mouth.X - snakeWidth/2 - 1,
 			Y: mouth.Y - snakeWidth/2 - 1,
 		},
 		snakeWidth+2,
-		firefly.Solid(firefly.ColorBlue),
+		firefly.Solid(headColor),
 	)
 
 	// Inner light circle representing the open eyelids.
 	eyelidColor := firefly.ColorLightBlue
-	if eye.peer > 0 {
-		eyelidColor = firefly.ColorGreen
+	if !me {
+		eyelidColor = firefly.ColorLightGray
 	}
 	firefly.DrawCircle(
 		firefly.Point{
@@ -104,5 +106,4 @@ func (eye *Eye) render(mouth firefly.Point) {
 			firefly.Solid(eyelidColor),
 		)
 	}
-
 }

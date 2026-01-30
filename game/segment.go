@@ -17,7 +17,7 @@ func (s *Segment) line() Line {
 }
 
 // render the snake's segment
-func (s *Segment) render(frame int, state State) {
+func (s *Segment) render(frame int, state State, me bool) {
 	if s.tail == nil {
 		return
 	}
@@ -34,13 +34,24 @@ func (s *Segment) render(frame int, state State) {
 	if !s.hurt {
 		switch ((s.head.X + s.head.Y) / 12) % 3 {
 		case 0:
-			c = firefly.ColorDarkBlue
+			if me {
+				c = firefly.ColorDarkBlue
+			} else {
+				c = firefly.ColorDarkGray
+			}
 		case 1:
-			c = firefly.ColorLightBlue
+			if me {
+				c = firefly.ColorLightBlue
+			} else {
+				c = firefly.ColorLightGray
+			}
 		case 2:
-			c = firefly.ColorBlue
+			if me {
+				c = firefly.ColorBlue
+			} else {
+				c = firefly.ColorGray
+			}
 		}
-
 	}
 	drawSegment(start, end, c)
 }

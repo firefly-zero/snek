@@ -62,7 +62,7 @@ func newSnake(peer firefly.Peer, isMultiplayer bool) *Snake {
 		peer:   peer,
 		score:  newScore(peer),
 		youTTL: youTTL,
-		eye:    Eye{peer: peer},
+		eye:    Eye{},
 		head: &Segment{
 			head: firefly.P(segmentLen*2, shift),
 			tail: &Segment{
@@ -230,14 +230,14 @@ func (s *Snake) render() {
 	frame = frame % period
 	segment := s.head
 	for segment != nil {
-		segment.render(frame, s.state)
+		segment.render(frame, s.state, s.peer == me)
 		segment = segment.tail
 	}
 	s.renderNeck()
 	if s.crown {
 		s.renderCrown()
 	}
-	s.eye.render(s.mouth)
+	s.eye.render(s.mouth, s.peer == me)
 	if s.youTTL != 0 {
 		s.renderYou()
 	}
@@ -252,7 +252,11 @@ func (s *Snake) renderNeck() {
 	mouth := s.mouth
 	neck.X, mouth.X = denormalizeX(neck.X, mouth.X)
 	neck.Y, mouth.Y = denormalizeY(neck.Y, mouth.Y)
-	drawSegment(neck, mouth, firefly.ColorBlue)
+	c := firefly.ColorBlue
+	if s.peer != me {
+		c = firefly.ColorGray
+	}
+	drawSegment(neck, mouth, c)
 }
 
 func (s *Snake) renderCrown() {
