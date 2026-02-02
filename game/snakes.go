@@ -15,6 +15,7 @@ func newSnakes() *Snakes {
 	}
 	return &Snakes{snakes}
 }
+
 func (ss *Snakes) update() {
 	if ss == nil {
 		return
@@ -42,33 +43,36 @@ func (ss *Snakes) update() {
 	for i, s1 := range snakes.items {
 		for j, s2 := range snakes.items {
 			sameSnek := i == j
-			if s1.bites(sameSnek, s2) {
-				if sameSnek {
-					firefly.AddProgress(s1.peer, badgeBiteSelf, 1)
+			if !s1.bites(sameSnek, s2) {
+				continue
+			}
+			if sameSnek {
+				firefly.AddProgress(s1.peer, badgeBiteSelf, 1)
+			} else {
+				firefly.AddProgress(s1.peer, badgeBiteOther, 1)
+			}
+			s1.eye.hurt = true
+			s1.score.dec()
+
+			// If the snake reached zero score, handle game over.
+			if s1.score.val != 0 {
+				continue
+			}
+			if sameSnek {
+				if s1.peer == me {
+					setTitle("u bit urself :(")
 				} else {
-					firefly.AddProgress(s1.peer, badgeBiteOther, 1)
+					setTitle("other snek bit itself, u win")
 				}
-				s1.eye.hurt = true
-				s1.score.dec()
-				if s1.score.val == 0 {
-					if sameSnek {
-						if s1.peer == me {
-							setTitle("u bit urself :(")
-						} else {
-							setTitle("other snek bit itself, u win")
-						}
-					} else {
-						if s1.peer == me {
-							setTitle("u lose :(")
-						} else {
-							setTitle("u win")
-						}
-					}
+			} else {
+				if s1.peer == me {
+					setTitle("u lose :(")
+				} else {
+					setTitle("u win")
 				}
 			}
 		}
 	}
-
 }
 
 func (ss *Snakes) render() {

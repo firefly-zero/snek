@@ -59,7 +59,7 @@ func (s *Score) update() {
 				if s.peer == me {
 					setTitle("ur snek ded cuz its hungie :(")
 				} else {
-					setTitle("aze snek ded cuz its hungie, u win")
+					setTitle("aze snek got hungie, u win")
 				}
 			}
 		}

@@ -293,7 +293,10 @@ func (s *Snake) renderYou() {
 func (s *Snake) renderScore() {
 	font.Draw(
 		formatInt(s.score.val),
-		firefly.P(s.mouth.X-3, s.mouth.Y+snakeWidth+3),
+		firefly.P(
+			s.mouth.X-font.CharWidth(),
+			s.mouth.Y+snakeWidth+font.CharHeight(),
+		),
 		s.score.color,
 	)
 }
