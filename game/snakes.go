@@ -4,6 +4,8 @@ import (
 	"github.com/firefly-zero/firefly-go/firefly"
 )
 
+var isMultiplayer bool
+
 type Snakes struct {
 	items []*Snake
 }
@@ -17,10 +19,10 @@ func newSnakes() *Snakes {
 	hungerPeriodSeconds := 4 + len(peers)
 	hungerPeriod = uint16(hungerPeriodSeconds) * 60
 
-	isMultiplayer := len(peers) != 1
+	isMultiplayer = len(peers) != 1
 	snakes := make([]*Snake, len(peers))
 	for i, peer := range peers {
-		snakes[i] = newSnake(peer, isMultiplayer)
+		snakes[i] = newSnake(peer)
 	}
 	return &Snakes{snakes}
 }
@@ -67,6 +69,7 @@ func (ss *Snakes) update() {
 			if s1.score.val != 0 {
 				continue
 			}
+			updateLeaderBoard()
 			snakes.deleteSnake(s1)
 			gameOver := snakes.gameOver()
 			if sameSnake {

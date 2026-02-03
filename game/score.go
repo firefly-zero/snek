@@ -61,6 +61,7 @@ func (s *Score) update() {
 			s.dec()
 			s.hunger = hungerPeriod
 			if s.val == 0 {
+				updateLeaderBoard()
 				snakes.deletePeer(s.peer)
 				gameOver := snakes.gameOver()
 				if s.peer == me {
