@@ -8,6 +8,13 @@ type Snakes struct {
 
 func newSnakes() *Snakes {
 	peers := firefly.GetPeers().Slice()
+
+	// Set the global hunger period based on the number of players.
+	// The more people play, the longer it takes for one snake
+	// to get an apple (because of competition).
+	hungerPeriodSeconds := 4 + len(peers)
+	hungerPeriod = uint16(hungerPeriodSeconds) * 60
+
 	isMultiplayer := len(peers) != 1
 	snakes := make([]*Snake, len(peers))
 	for i, peer := range peers {

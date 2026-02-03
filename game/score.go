@@ -15,7 +15,7 @@ const (
 )
 
 // How long (in frames) the snake can go without food.
-var hungerPeriod uint16 = 6 * 60
+var hungerPeriod uint16
 
 type Score struct {
 	peer firefly.Peer
