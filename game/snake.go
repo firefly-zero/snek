@@ -171,9 +171,9 @@ func (s *Snake) updateMouth(frame int) {
 func (s *Snake) tryEat() {
 	const minDist = (appleRadius+snakeWidth)/2 + 3
 	const minDist2 = minDist * minDist
-	x := float32(apple.pos.X - s.mouth.X)
-	y := float32(apple.pos.Y - s.mouth.Y)
-	dist2 := x*x + y*y
+	dx := float32(apple.pos.X - s.mouth.X)
+	dy := float32(apple.pos.Y - s.mouth.Y)
+	dist2 := dx*dx + dy*dy
 	if dist2 > minDist2 {
 		return
 	}

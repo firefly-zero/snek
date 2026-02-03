@@ -4,17 +4,18 @@ import (
 	"github.com/firefly-zero/firefly-go/firefly"
 )
 
+// For how long (in frames) the snake is invincible after a collision.
+const iFrames = 60
+
+// Badges.
 const (
-	// How long (in frames) the snake can go without food.
-	hungerPeriod = 6 * 60
-
-	// For how long (in frames) the snake is invulnerable after a collision.
-	iFrames = 60
-
 	badgeBiteSelf     firefly.Badge = 1
 	badgeBiteOther    firefly.Badge = 2
 	badgeEat100Apples firefly.Badge = 3
 )
+
+// How long (in frames) the snake can go without food.
+var hungerPeriod uint16 = 6 * 60
 
 type Score struct {
 	peer firefly.Peer
@@ -52,6 +53,10 @@ func (s *Score) update() {
 	}
 	if s.hunger == 0 {
 		// Hungry. Decrese the score and start counting again.
+		//
+		// Hunger has no effect when the score is zero,
+		// which prevents it from being activated at the beginning,
+		// before the snake eats the first apple.
 		if s.val != 0 {
 			s.dec()
 			s.hunger = hungerPeriod
@@ -75,9 +80,12 @@ func (s *Score) update() {
 //
 // Triggered by [Snake] when eating an apple.
 func (s *Score) inc() {
+	if hungerPeriod > 10 {
+		hungerPeriod -= 1
+	}
 	s.hunger = hungerPeriod
 	s.val += 1
-	firefly.AddProgress(firefly.Combined, badgeEat100Apples, 1)
+	firefly.AddProgress(s.peer, badgeEat100Apples, 1)
 	s.color = firefly.ColorDarkGreen
 	s.ttl = 60
 }
