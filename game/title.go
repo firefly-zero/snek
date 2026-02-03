@@ -29,7 +29,8 @@ func setTitle(msg string) {
 
 func (t *Title) update() {
 	t.ttl--
-	if t.ttl <= 0 {
+	btns := firefly.ReadButtons(firefly.Combined)
+	if btns.Any() || t.ttl <= 0 {
 		resetGame()
 	}
 }
