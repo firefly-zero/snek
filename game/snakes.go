@@ -4,6 +4,7 @@ import (
 	"github.com/firefly-zero/firefly-go/firefly"
 )
 
+// True if there are more than one player.
 var isMultiplayer bool
 
 type Snakes struct {
@@ -117,10 +118,7 @@ func (ss *Snakes) gameOver() bool {
 	if len(ss.items) == 0 {
 		return true
 	}
-	if len(ss.items) == 1 {
-		return firefly.GetPeers().Len() > 1
-	}
-	return false
+	return isMultiplayer && len(ss.items) == 1
 }
 
 func (ss *Snakes) render() {
