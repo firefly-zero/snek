@@ -91,7 +91,7 @@ func (s *Snake) update() {
 	s.score.update()
 
 	btns := firefly.ReadButtons(s.peer)
-	if btns.S {
+	if btns.Any() {
 		s.youTTL = 180
 	}
 }
