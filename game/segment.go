@@ -30,28 +30,32 @@ func (s *Segment) render(frame int, state State, me bool) {
 		end.X = start.X + (end.X-start.X)*(period-frame)/period
 		end.Y = start.Y + (end.Y-start.Y)*(period-frame)/period
 	}
-	c := firefly.ColorRed
-	if !s.hurt {
-		switch ((s.head.X + s.head.Y) / 12) % 3 {
-		case 0:
-			if me {
-				c = firefly.ColorDarkBlue
-			} else {
-				c = firefly.ColorDarkGray
-			}
-		case 1:
-			if me {
-				c = firefly.ColorLightBlue
-			} else {
-				c = firefly.ColorLightGray
-			}
-		case 2:
-			if me {
-				c = firefly.ColorBlue
-			} else {
-				c = firefly.ColorGray
-			}
+	c := s.color(me)
+	drawSegment(start, end, c)
+}
+
+func (s *Segment) color(me bool) firefly.Color {
+	if s.hurt {
+		return firefly.ColorRed
+	}
+	switch ((s.head.X + s.head.Y) / 12) % 3 {
+	case 0:
+		if me {
+			return firefly.ColorDarkBlue
+		} else {
+			return firefly.ColorDarkGray
+		}
+	case 1:
+		if me {
+			return firefly.ColorLightBlue
+		} else {
+			return firefly.ColorLightGray
+		}
+	default:
+		if me {
+			return firefly.ColorBlue
+		} else {
+			return firefly.ColorGray
 		}
 	}
-	drawSegment(start, end, c)
 }
