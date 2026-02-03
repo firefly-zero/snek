@@ -1,8 +1,6 @@
 package game
 
 import (
-	"fmt"
-
 	"github.com/firefly-zero/firefly-go/firefly"
 )
 
@@ -70,17 +68,18 @@ func (ss *Snakes) update() {
 				continue
 			}
 			snakes.deleteSnake(s1)
+			gameOver := snakes.gameOver()
 			if sameSnake {
 				if s1.peer == me {
-					setTitle("u bit urself :(")
-				} else {
-					setTitle("other snek bit itself, u win")
+					setTitle("u bit urself :(", gameOver)
+				} else if gameOver {
+					setTitle("other snek bit itself, u win", gameOver)
 				}
 			} else {
 				if s1.peer == me {
-					setTitle("u lose :(")
-				} else {
-					setTitle("u win")
+					setTitle("u lose :(", gameOver)
+				} else if gameOver {
+					setTitle("u win", gameOver)
 				}
 			}
 		}
@@ -112,7 +111,6 @@ func (ss *Snakes) deletePeer(peer firefly.Peer) {
 // In single-player, we end the game when the only snake dies.
 // In multiplayer, we end the game when only one snake is left.
 func (ss *Snakes) gameOver() bool {
-	firefly.LogDebug(fmt.Sprintf("n snakes: %d", len(ss.items)))
 	if len(ss.items) == 0 {
 		return true
 	}

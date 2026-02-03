@@ -62,10 +62,11 @@ func (s *Score) update() {
 			s.hunger = hungerPeriod
 			if s.val == 0 {
 				snakes.deletePeer(s.peer)
+				gameOver := snakes.gameOver()
 				if s.peer == me {
-					setTitle("ur snek ded cuz its hungie :(")
-				} else {
-					setTitle("aze snek got hungie, u win")
+					setTitle("ur snek ded cuz its hungie :(", gameOver)
+				} else if gameOver {
+					setTitle("aze snek got hungie, u win", gameOver)
 				}
 			}
 		}

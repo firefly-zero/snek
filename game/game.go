@@ -28,7 +28,9 @@ func resetGame() {
 func Update() {
 	if title != nil {
 		title.update()
-		return
+		if title != nil && title.blocking {
+			return
+		}
 	}
 	frame += 1
 	snakes.update()
@@ -38,7 +40,9 @@ func Render() {
 	firefly.ClearScreen(firefly.ColorWhite)
 	if title != nil {
 		title.render()
-		return
+		if title != nil && title.blocking {
+			return
+		}
 	}
 	apple.render()
 	snakes.render()
