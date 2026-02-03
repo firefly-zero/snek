@@ -256,8 +256,8 @@ func (s *Snake) split() {
 	segment.tail = nil
 
 	newSnake := &Snake{
-		peer:  s.peer,
-		score: s.score,
+		peer:  s.peer,  // Both snakes are controlled by the same player.
+		score: s.score, // Both snakes share the same score.
 		head:  newHead,
 		mouth: newHead.head,
 		dir:   s.dir,

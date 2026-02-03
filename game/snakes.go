@@ -1,6 +1,10 @@
 package game
 
-import "github.com/firefly-zero/firefly-go/firefly"
+import (
+	"fmt"
+
+	"github.com/firefly-zero/firefly-go/firefly"
+)
 
 type Snakes struct {
 	items []*Snake
@@ -49,11 +53,11 @@ func (ss *Snakes) update() {
 
 	for i, s1 := range snakes.items {
 		for j, s2 := range snakes.items {
-			sameSnek := i == j
-			if !s1.bites(sameSnek, s2) {
+			sameSnake := i == j
+			if !s1.bites(sameSnake, s2) {
 				continue
 			}
-			if sameSnek {
+			if sameSnake {
 				firefly.AddProgress(s1.peer, badgeBiteSelf, 1)
 			} else {
 				firefly.AddProgress(s1.peer, badgeBiteOther, 1)
@@ -65,7 +69,8 @@ func (ss *Snakes) update() {
 			if s1.score.val != 0 {
 				continue
 			}
-			if sameSnek {
+			snakes.deleteSnake(s1)
+			if sameSnake {
 				if s1.peer == me {
 					setTitle("u bit urself :(")
 				} else {
@@ -80,6 +85,41 @@ func (ss *Snakes) update() {
 			}
 		}
 	}
+}
+
+func (ss *Snakes) deleteSnake(tar *Snake) {
+	newItems := make([]*Snake, 0, len(ss.items)-1)
+	for _, s := range ss.items {
+		if s != tar {
+			newItems = append(newItems, s)
+		}
+	}
+	ss.items = newItems
+}
+
+func (ss *Snakes) deletePeer(peer firefly.Peer) {
+	newItems := make([]*Snake, 0, len(ss.items)-1)
+	for _, s := range ss.items {
+		if s.peer != peer {
+			newItems = append(newItems, s)
+		}
+	}
+	ss.items = newItems
+}
+
+// Check if the game over screen should be shown.
+//
+// In single-player, we end the game when the only snake dies.
+// In multiplayer, we end the game when only one snake is left.
+func (ss *Snakes) gameOver() bool {
+	firefly.LogDebug(fmt.Sprintf("n snakes: %d", len(ss.items)))
+	if len(ss.items) == 0 {
+		return true
+	}
+	if len(ss.items) == 1 {
+		return firefly.GetPeers().Len() > 1
+	}
+	return false
 }
 
 func (ss *Snakes) render() {

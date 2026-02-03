@@ -13,6 +13,9 @@ type Title struct {
 }
 
 func setTitle(msg string) {
+	if !snakes.gameOver() {
+		return
+	}
 	if len(snakes.items) == 1 {
 		snake := snakes.items[0]
 		firefly.AddScore(snake.peer, singleplayer, snake.score.val)
@@ -35,7 +38,7 @@ func (t *Title) update() {
 	}
 }
 
-func (t Title) render() {
+func (t *Title) render() {
 	x := (firefly.Width - font.LineWidth(t.msg)) / 2
 	y := (firefly.Height + font.CharHeight()) / 2
 	firefly.DrawText(t.msg, font, firefly.P(x, y), firefly.ColorBlack)
