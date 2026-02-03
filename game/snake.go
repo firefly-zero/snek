@@ -89,6 +89,11 @@ func (s *Snake) update() {
 	s.updateMouth(frame)
 	s.eye.update(s.mouth)
 	s.score.update()
+
+	btns := firefly.ReadButtons(s.peer)
+	if btns.S {
+		s.youTTL = 180
+	}
 }
 
 // Set Dir value based on the pad input.
@@ -286,8 +291,9 @@ func (s *Snake) renderCrown() {
 
 // Render a "you" message above the snake's head.
 func (s *Snake) renderYou() {
-	p := firefly.P(s.mouth.X-5, s.mouth.Y-6)
-	font.Draw("you", p, firefly.ColorRed)
+	x := s.mouth.X - font.CharWidth()*3/2
+	y := s.mouth.Y - 6
+	font.Draw("you", firefly.P(x, y), firefly.ColorRed)
 }
 
 func (s *Snake) renderScore() {
