@@ -91,7 +91,9 @@ func (s *Snake) update() {
 	s.score.update()
 
 	btns := firefly.ReadButtons(s.peer)
-	if btns.Any() {
+	if btns.S {
+		s.split()
+	} else if btns.Any() {
 		s.youTTL = 180
 	}
 }
@@ -228,6 +230,39 @@ func (s *Snake) bites(me bool, other *Snake) bool {
 		segment = segment.tail
 	}
 	return false
+}
+
+// Split the snake into two in the middle.
+//
+// It also removes one segment from the middle
+// to make it a bit easier to avoid snakes collision.
+func (s *Snake) split() {
+	nSegments := 0
+	segment := s.head
+	for segment != nil {
+		nSegments += 1
+		segment = segment.tail
+	}
+	if nSegments < 6 {
+		return
+	}
+
+	segment = s.head
+	for range nSegments/2 - 2 {
+		segment = segment.tail
+	}
+
+	newHead := segment.tail.tail
+	segment.tail = nil
+
+	newSnake := &Snake{
+		peer:  s.peer,
+		score: s.score,
+		head:  newHead,
+		mouth: newHead.head,
+		dir:   s.dir,
+	}
+	snakes.items = append(snakes.items, newSnake)
 }
 
 // render all segments and the head of the snake
