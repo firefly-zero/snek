@@ -64,7 +64,7 @@ func (s *Score) update() {
 				updateLeaderBoard()
 				snakes.deletePeer(s.peer)
 				gameOver := snakes.gameOver()
-				if s.peer == me {
+				if me.Eq(s.peer) {
 					setTitle("ur snek ded cuz its hungie :(", gameOver)
 				} else if gameOver {
 					setTitle("aze snek got hungie, u win", gameOver)

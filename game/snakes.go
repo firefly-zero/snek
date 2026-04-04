@@ -23,7 +23,7 @@ func newSnakes() *Snakes {
 	isMultiplayer = len(peers) != 1
 	snakes := make([]*Snake, len(peers))
 	for i, peer := range peers {
-		snakes[i] = newSnake(peer)
+		snakes[i] = newSnake(i, peer)
 	}
 	return &Snakes{snakes}
 }
@@ -74,13 +74,13 @@ func (ss *Snakes) update() {
 			snakes.deleteSnake(s1)
 			gameOver := snakes.gameOver()
 			if sameSnake {
-				if s1.peer == me {
+				if me.Eq(s1.peer) {
 					setTitle("u bit urself :(", gameOver)
 				} else if gameOver {
 					setTitle("other snek bit itself, u win", gameOver)
 				}
 			} else {
-				if s1.peer == me {
+				if me.Eq(s1.peer) {
 					setTitle("u lose :(", gameOver)
 				} else if gameOver {
 					setTitle("u win", gameOver)

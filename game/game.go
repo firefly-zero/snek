@@ -9,7 +9,7 @@ var (
 	frame  int
 	snakes *Snakes
 	title  *Title
-	me     firefly.Peer
+	me     firefly.Me
 )
 
 func Boot() {
@@ -72,7 +72,7 @@ func Cheat(c, v int) int {
 
 func getMySnake() *Snake {
 	for _, s := range snakes.items {
-		if s.peer == me {
+		if me.Eq(s.peer) {
 			return s
 		}
 	}

@@ -52,10 +52,10 @@ type Snake struct {
 	crown bool
 }
 
-func newSnake(peer firefly.Peer) *Snake {
-	shift := 10 + snakeWidth + int(peer)*20
+func newSnake(i int, peer firefly.Peer) *Snake {
+	shift := 10 + snakeWidth + i*20
 	var youTTL uint8
-	if peer == me && isMultiplayer {
+	if me.Eq(peer) && isMultiplayer {
 		youTTL = 180
 	}
 	return &Snake{
@@ -270,14 +270,14 @@ func (s *Snake) render() {
 	frame = frame % period
 	segment := s.head
 	for segment != nil {
-		segment.render(frame, s.state, s.peer == me)
+		segment.render(frame, s.state, me.Eq(s.peer))
 		segment = segment.tail
 	}
 	s.renderNeck()
 	if s.crown {
 		s.renderCrown()
 	}
-	s.eye.render(s.mouth, s.peer == me)
+	s.eye.render(s.mouth, me.Eq(s.peer))
 	if s.youTTL != 0 {
 		s.renderYou()
 	}
@@ -293,7 +293,7 @@ func (s *Snake) renderNeck() {
 	neck.X, mouth.X = denormalizeX(neck.X, mouth.X)
 	neck.Y, mouth.Y = denormalizeY(neck.Y, mouth.Y)
 	c := firefly.ColorBlue
-	if s.peer != me {
+	if !me.Eq(s.peer) {
 		c = firefly.ColorGray
 	}
 	drawSegment(neck, mouth, c)
